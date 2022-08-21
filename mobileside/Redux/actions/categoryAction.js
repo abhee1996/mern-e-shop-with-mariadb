@@ -17,7 +17,9 @@ export const getCategories = async (setCategoryState, id) => {
   };
   try {
     const res = await axios.get(categoriesURL, configHeaders);
+
     setCategoryState(res.data);
+    return res;
     // return res;
   } catch (error) {
     console.log('error', error);

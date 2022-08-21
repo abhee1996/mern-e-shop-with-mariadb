@@ -14,5 +14,14 @@ router.get(
   "/totalsales/status/shipped",
   Ordercontroller.totalSalesbyStatusShipped
 );
-
+//shop owner update order status against user_uid and orderUuid
+router.put(
+  "/trackOrder/shipping/status/order_uuid/:orderUuid/user/:user_uid",
+  Ordercontroller.updateOrderStatusbyUserUuid
+);
+//user update order  status against shop_uid and orderUuid
+router.put(
+  "/trackOrder/shipping/status/order_uuid/:orderUuid/shop/:shop_uuid",
+  Ordercontroller.updateOrderStatusbyShopUuid
+);
 module.exports = router;

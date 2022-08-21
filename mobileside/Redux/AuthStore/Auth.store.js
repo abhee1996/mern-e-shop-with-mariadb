@@ -15,8 +15,24 @@ import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly';
 import AuthShopReducer from '../reducers/AuthShop.reducer';
 import {setCurrentUser} from '../actions/Auth.Action';
 import {setCurrentShop} from '../actions/ShopAuth.action';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+
+const getAsyncData = async (setUser, setShop) => {
+  try {
+    //for shop
+    await AsyncStorage.getItem('shop_jwt_decoded').then(res => {
+      setShop(JSON.parse(res));
+    });
+    // for user
+    await AsyncStorage.getItem('user_jwt_decoded').then(res => {
+      setUser(JSON.parse(res));
+    });
+  } catch (error) {
+    console.warn(error);
+  }
+};
 const Auth = props => {
-  const [authContext, setAuthContext] = useState(null);
   const [stateUser, dispatch] = useReducer(AuthReducer, {
     isAuthenticated: null,
     user: {},
@@ -25,13 +41,19 @@ const Auth = props => {
     isShopAuthenticated: null,
     shop: {},
   });
+  const [user, setUser] = React.useState(null);
+  const [firestoreUser, setFirestoreUser] = React.useState(null);
+  const [shop, setShop] = React.useState(null);
   const [showChild, setShowChild] = useState(false);
-  const {userValue, shopValue, contextValue} = props;
+  const userValue = React.useMemo(() => ({user, setUser}), [user, setUser]);
+  const shopValue = React.useMemo(() => ({shop, setShop}), [shop, setShop]);
   useEffect(() => {
     setShowChild(true);
+    getAsyncData(setUser, setShop);
+
     // AsyncStorage.
     if (AsyncStorage.user_login_Jwt_Token) {
-      // AsyncStorage.setItem(`stateUser`, stateUser);
+      AsyncStorage.setItem(`stateUser`, stateUser);
 
       const decoded = AsyncStorage.user_login_Jwt_Token
         ? AsyncStorage.user_login_Jwt_Token
@@ -42,7 +64,7 @@ const Auth = props => {
     }
     // Shop //
     else if (AsyncStorage.shop_jwt) {
-      console.log('shop_jwt', AsyncStorage.shop_jwt);
+      AsyncStorage.setItem(`stateShop`, stateShop);
 
       const decoded = AsyncStorage.shop_jwt ? AsyncStorage.shop_jwt : '';
 
@@ -67,6 +89,76 @@ const Auth = props => {
           dispatchShop,
           userValue,
           shopValue,
+          setFirestoreUser,
+          firestoreUser,
+          loginWithFireStore: async (email, password) => {
+            try {
+              const _isLogin = await auth().signInWithEmailAndPassword(
+                email,
+                password,
+              );
+              console.log('isLogin', _isLogin);
+              return _isLogin;
+            } catch (error) {
+              console.log('fire auth login error', error);
+            }
+          },
+          registerWithFireStore: async (
+            name,
+            email,
+            password,
+            isUser,
+            isShop,
+          ) => {
+            try {
+              console.log('registering in firebase');
+              const res = await auth().createUserWithEmailAndPassword(
+                email,
+                password,
+              ); //
+              console.log('res auth create user', res);
+              if (res) {
+                if (isUser == true) {
+                  console.log('isUser:>', isUser);
+                  await firestore()
+                    .collection('eshop')
+                    .doc('eShop-hV1O5KpI9ZhoOqjA0CuZqcJfdyl2')
+                    .collection('users')
+                    .doc(res.user.uid)
+                    .set({
+                      name: name,
+                      email: res.user.email,
+                      uid: res.user.uid,
+                      isUser: isUser,
+                      isShop: isShop,
+                    });
+                } else {
+                  console.log('isShop:', isShop);
+                  await firestore()
+                    .collection('eshop')
+                    .doc('eShop-hV1O5KpI9ZhoOqjA0CuZqcJfdyl2')
+                    .collection('shops')
+                    .doc(res.user.uid)
+                    .set({
+                      name: name,
+                      email: res.user.email,
+                      shopId: res.user.uid,
+                      isUser: isUser,
+                      isShop: isShop,
+                    });
+                }
+              }
+            } catch (error) {
+              console.log('fire auth register error', error);
+            }
+          },
+          logoutWithFireStore: async () => {
+            try {
+              await auth().signOut();
+            } catch (error) {
+              console.log('fire auth signout error', error);
+            }
+          },
         }}>
         {props.children}
       </AuthGlobal.Provider>

@@ -6,9 +6,10 @@ import {
   View,
   VirtualizedList,
 } from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {Badge, Text, List} from 'native-base';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import AuthGlobal from '../../Redux/AuthStore/AuthGlobal';
 export default function Categories(props) {
   const {
     category,
@@ -19,11 +20,10 @@ export default function Categories(props) {
     active,
     setActive,
   } = props;
+  const context = useContext(AuthGlobal);
+  const ShopId = context?.shopValue?.shop?.shopId;
   useEffect(() => {
     categoryFilter('all'), setActive(-1);
-    return () => {
-      categoryFilter('all'), setActive(-1);
-    };
   }, []);
 
   return (
@@ -45,7 +45,9 @@ export default function Categories(props) {
           style={
             (styles.center, [active == -1 ? styles.active : styles.inactive])
           }>
-          <Text style={{color: 'grey'}}>All</Text>
+          <Text style={[active == -1 ? styles.active : styles.inactive]}>
+            {ShopId ? `All Shop Products` : `All`}
+          </Text>
         </Badge>
       </TouchableOpacity>
       {categories.map(itm => {
@@ -54,7 +56,6 @@ export default function Categories(props) {
             <TouchableOpacity
               key={itm.id}
               onPress={() => {
-                console.log('itm.CategoryId', {itm}, itm.id);
                 categoryFilter(itm.id), setActive(categories.indexOf(itm));
               }}>
               <Badge

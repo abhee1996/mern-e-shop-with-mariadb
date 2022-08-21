@@ -24,6 +24,8 @@ import * as actions from '../../Redux/actions/cartAction';
 const {width, height} = Dimensions.get('window');
 import {connect} from 'react-redux';
 import CartList from './CartList';
+import colors from '../../config/colors';
+import AppIconButton from '../../Component/AppButtons/AppIconButton';
 const CartScreen = props => {
   const {cartItems, clearCart, navigation} = props;
   let total = 0;
@@ -37,12 +39,40 @@ const CartScreen = props => {
       {cartItems.length ? (
         <>
           <Container>
-            <Heading size="md" style={{alignSelf: 'center'}}>
-              Cart
-            </Heading>
-            <ScrollView style={{width: width - 10, height: height - 218}}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                backgroundColor: colors.voiletpro.violet500,
+                alignItems: 'center',
+                height: 55,
+                width: width,
+              }}>
+              <AppIconButton
+                leftIcon={true}
+                iconAs="MaterialIcons"
+                name="arrow-back"
+                width={-45}
+                height={23}
+                size={40}
+                txtColor={colors.default.white}
+                style={{
+                  right: 8,
+                }}
+                buttonStyle={{
+                  alignSelf: 'center',
+                  justifyContent: 'center',
+                  top: 11,
+                }}
+                iconColor={colors.purplepro.purple500}
+                onPress={() => props.navigation.goBack()}
+              />
+              <Text style={{color: colors.default.white, fontSize: 25}}>
+                My Cart
+              </Text>
+            </View>
+            <ScrollView style={{width: width - 10, height: height - 235}}>
               {props?.cartItems?.map(data => {
-                console.log('data', data);
                 const item = data;
                 // const {item} = data?.product;
                 return (

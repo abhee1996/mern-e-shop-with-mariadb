@@ -9,6 +9,7 @@ import {
   View,
   Text,
   Dimensions,
+  TouchableOpacity,
 } from 'react-native';
 import colors from '../../config/colors';
 import config from '../../config/config';
@@ -21,19 +22,13 @@ import {Select} from 'native-base';
 const {width, height} = Dimensions.get('window');
 const Header = props => {
   const context = useContext(AuthGlobal);
-  console.log('context.userValue', context.userValue);
   const [currentShop, setCurrentShop] = useState();
   const [userProfile, setuserProfile] = useState();
-  // console.log('Header context.contextValue', context.contextValue);
   const navigation = useNavigation();
-  // console.log('useNavigation', navigation);
-  const userId = context?.userValue?.userId;
-  const shopId = context?.shopValue?.shopId;
-  const isShopAuthenticated = context.stateShop.isShopAuthenticated;
+  const userId = context?.userValue?.user?.userId;
+  const shopId = context?.shopValue?.shop?.shopId;
   let [language, setLanguage] = useState('key0');
 
-  // console.log('isShopAuthenticated', isShopAuthenticated);
-  // console.log('userId', userId);
   if (userId) {
     useEffect(() => {
       if (userId === null) {
@@ -72,44 +67,59 @@ const Header = props => {
             console.log('error in get shop details', err);
           });
       });
-      console.log('currentShop', currentShop);
-      return () => {
-        // setuserProfile();
-      };
     }, [shopId]);
   }
   return (
     <SafeAreaView style={styles.header}>
       <View
         style={{
-          width: width - 10,
-          height: height / 14,
-          backgroundColor: '#AD40AF',
+          width: width / 1,
+          height: height / 13,
+
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          justifyContent: 'space-around',
         }}>
         {shopId ? (
           <>
             <View
               style={{
                 flexDirection: 'row',
-                // borderWidth: 1,
                 width: width / 1.07,
-                justifyContent: 'space-around',
+                justifyContent: 'space-evenly',
               }}>
-              <View
+              <TouchableOpacity
+                onPress={() => alert(currentShop?.name?.toUpperCase())}
                 style={{
-                  width: 150,
-                  height: 50,
-                  right: 20,
+                  alignSelf: 'center',
+                  right: 48,
+                  width: width / 4,
+                  height: 30,
+                  marginLeft: 10,
+                  top: 5,
+                  // borderWidth: 2,
+                  flexWrap: 'wrap',
+                  flexDirection: 'row',
                 }}>
-                <Text style={{color: '#fff'}}>
-                  shop Id: {currentShop?.shopUuid}
+                <Text
+                  style={{
+                    color: '#fff',
+                    top: 20,
+                  }}
+                  ellipsizeMode={'tail'}
+                  numberOfLines={1}>
+                  {currentShop?.name?.toUpperCase()}
                 </Text>
-              </View>
+              </TouchableOpacity>
               <View
                 style={{
-                  width: 50,
-                  height: 50,
-                  right: 45,
+                  // width: 50,
+                  // height: 50,
+                  // right: 45,
+                  marginVertical: 2,
+
+                  right: 30,
+                  marginHorizontal: 10,
                 }}>
                 <Image
                   style={{
@@ -124,29 +134,51 @@ const Header = props => {
                 style={{
                   width: 50,
                   height: 50,
-                  left: 40,
+                  left: 55,
+                  marginRight: 10,
                 }}>
                 <AppIconButton
                   style={{
                     fontWeight: 'bold',
+                  }}
+                  IconStyle={{
+                    left: 1,
                   }}
                   leftIcon={true}
                   iconAs={'AntDesign'}
                   iconColor={'#fff'}
                   name={'logout'}
                   size={17}
-                  width={-60}
+                  width={-62}
                   height={-8}
                   marginY="20%"
                   borderRadius={20}
                   buttonBgColor={colors.dangerpro.danger600}
-                  txtColor={colors.default.white}
                   onPress={() => {
                     AsyncStorage.removeItem('shop_jwt'),
                       shoplogout(context.dispatchShop);
                     navigation.navigate('Login');
                   }}
                 />
+                {/* <AppIconButton
+                  style={{
+                    fontWeight: 'bold',
+                  }}
+                  leftIcon={true}
+                  iconAs={'MaterialCommunityIcons'}
+                  iconColor={'#fff'}
+                  name={'android-messages'}
+                  size={17}
+                  width={-60}
+                  height={-8}
+                  marginY="20%"
+                  borderRadius={20}
+                  buttonBgColor={colors.warningpro.warning400}
+                  txtColor={colors.default.white}
+                  onPress={() => {
+                    navigation.navigate('InboxScreen');
+                  }}
+                /> */}
               </View>
             </View>
           </>
@@ -157,48 +189,86 @@ const Header = props => {
                 <View
                   style={{
                     flexDirection: 'row',
-
-                    width: width - 50,
+                    justifyContent: 'space-evenly',
+                    width: width / 1.07,
                   }}>
-                  <View
+                  <TouchableOpacity
+                    onPress={() => alert(userProfile?.name)}
                     style={{
                       alignSelf: 'center',
-                      alignItems: 'center',
-                      alignContent: 'center',
+                      left: 75,
+                      width: 100,
+                      marginLeft: 10,
+
+                      flexWrap: 'wrap',
+                      flexDirection: 'row',
                     }}>
                     <Text
                       style={{
                         color: '#fff',
-                      }}>
-                      user : {userProfile?.email}
+                      }}
+                      ellipsizeMode={'tail'}
+                      numberOfLines={1}>
+                      {userProfile?.name?.toUpperCase()}
                     </Text>
+                  </TouchableOpacity>
+                  <View>
+                    <Image
+                      style={{
+                        height: 50,
+                        right: 13,
+                      }}
+                      resizeMode="contain"
+                      source={require('../../assets/shopping-cart-20380.png')}
+                    />
                   </View>
-                  <Image
-                    style={{height: 50, right: 200}}
-                    resizeMode="contain"
-                    source={require('../../assets/shopping-cart-20380.png')}
-                  />
-                  <AppIconButton
+                  <View
                     style={{
-                      right: 310,
-                      fontWeight: 'bold',
-                    }}
-                    leftIcon={true}
-                    iconAs={'AntDesign'}
-                    iconColor={'#fff'}
-                    name={'logout'}
-                    size={17}
-                    width={-60}
-                    height={-8}
-                    marginY="25%"
-                    borderRadius={20}
-                    buttonBgColor={colors.dangerpro.danger600}
-                    txtColor={colors.default.white}
-                    onPress={() => {
-                      userlogout(context.dispatch);
-                      navigation.navigate('Login');
-                    }}
-                  />
+                      width: 100,
+                      height: 50,
+                      right: 85,
+
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}>
+                    <AppIconButton
+                      style={{
+                        left: 10,
+                      }}
+                      leftIcon={true}
+                      iconAs={'MaterialCommunityIcons'}
+                      iconColor={colors.amber.amber300}
+                      name={'android-messages'}
+                      size={40}
+                      width={-30}
+                      height={6}
+                      marginY="18%"
+                      borderRadius={20}
+                      onPress={() => {
+                        navigation.navigate('InboxScreen');
+                      }}
+                    />
+                    <AppIconButton
+                      leftIcon={true}
+                      iconAs={'AntDesign'}
+                      iconColor={colors.default.white}
+                      IconStyle={{
+                        fontWeight: '800',
+                        left: 1,
+                      }}
+                      name={'logout'}
+                      size={18}
+                      width={-60}
+                      height={-9}
+                      marginY="30%"
+                      borderRadius={20}
+                      buttonBgColor={colors.dangerpro.danger600}
+                      onPress={() => {
+                        userlogout(context.dispatch);
+                        navigation.navigate('Login');
+                      }}
+                    />
+                  </View>
                 </View>
               </>
             ) : (
@@ -218,10 +288,10 @@ const Header = props => {
 };
 const styles = StyleSheet.create({
   header: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingVertical: 10,
+    // width: width,
+    // flexDirection: 'row',
+    // justifyContent: 'center',
+    // paddingVertical: 10,
     backgroundColor: '#AD40AF',
   },
 });
@@ -235,7 +305,7 @@ style={{
   // backgroundColor: 'red',
   // borderWidth: 2,
   borderColor: '#03bafc',
-}}>
+}}>markjons@mail.com
 <Select
   style={{
     // borderWidth: 2,

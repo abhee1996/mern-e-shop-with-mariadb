@@ -21,13 +21,12 @@ const Login = props => {
   const context = useContext(AuthGlobal);
   const myRef = React.useRef();
   // const ShopId = context?.contextValue?.authContext?.shopId;
-
+  // console.log('context', context);
   const UserId = context?.stateUser?.user?.userId;
   const isAuthenticated = context.stateUser.isAuthenticated;
   const isShopAuthenticated = context.stateShop.isShopAuthenticated;
 
   const {navigation} = props;
-  console.log('props.navigation', props.navigation);
   const toast = useToast();
   useEffect(() => {
     if (context.stateUser.isAuthenticated === true) {
@@ -49,13 +48,18 @@ const Login = props => {
     } else {
       if (isShop !== true) {
         const result = await loginUser(user, context.dispatch);
+        const fireRes = await context?.loginWithFireStore(email, password);
+        console.log('fireRes && result', fireRes, result);
         if (result.isloggedIn) {
           DevSettings.reload();
         }
       } else {
-        console.log(' login as Shop', isShop);
+        console.log(' login as Shop');
 
         const shopResult = await loginShop(user, context.dispatchShop);
+        const fireRes = await context?.loginWithFireStore(email, password);
+        console.log('fireRes && result', fireRes, shopResult);
+
         if (shopResult?.isloggedIn) {
           DevSettings.reload();
           props.navigation.navigate('Home');

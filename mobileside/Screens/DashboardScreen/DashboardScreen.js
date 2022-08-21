@@ -13,10 +13,11 @@ const DashboardScreen = () => {
   const [currentShop, setCurrentShop] = useState();
 
   const navigation = useNavigation();
-  const ShopId = context?.shopValue?.shopId;
   const shop = context?.shopValue;
-  const isShopAuthenticated = context?.shopValue?.isShop;
 
+  const isShopAuthenticated = context?.shopValue?.shop?.isShop;
+  const UserId = context?.userValue?.user?.userId;
+  const ShopId = context?.shopValue?.shop?.shopId;
   useEffect(() => {
     if (isShopAuthenticated === false || isShopAuthenticated === null) {
       navigation.navigate('Login');
@@ -43,16 +44,16 @@ const DashboardScreen = () => {
       style={{
         flex: 1,
         backgroundColor: colors.voiletpro.violet500,
-        // justifyContent: 'center',
         alignItems: 'center',
-        // alignSelf: 'center',
       }}>
       <Text style={{fontWeight: 'bold', fontSize: 20}}>
         Welcome to Shop Dashboard
       </Text>
-      <Text style={{color: '#fff'}}>
+      <Text style={{color: '#fff', fontSize: 20}}>
         Shop Name :{`\t ${currentShop?.name}`}
       </Text>
+      <Text style={{fontWeight: 'bold', fontSize: 25}}>Shop Profile</Text>
+
       {ShopId ? (
         <>
           <RegisterShop isShopAuthenticated={isShopAuthenticated} />

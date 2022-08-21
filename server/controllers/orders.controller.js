@@ -14,6 +14,8 @@ module.exports = {
   getOrdersByShopUUID,
   totalSalesbyStatusShipped,
   getCountOrder,
+  updateOrderStatusbyShopUuid,
+  updateOrderStatusbyUserUuid,
 };
 //getall
 async function getlist(req, res) {
@@ -186,6 +188,43 @@ async function updateOrders(req, res) {
   }
   res.status(200).json(result);
 }
+async function updateOrderStatusbyUserUuid(req, res) {
+  let _uuid = req.params.id;
+  let userUid = req.params.id;
+
+  console.log("req.params", req.params);
+  const reqbody = req.body;
+  let orderStatus = {
+    status: "Dispatched",
+  };
+  const result = await Orders.update(orderStatus, {
+    where: { orderUuid: _uuid, user_uid: userUid },
+  });
+  if (!result) {
+    res
+      .status(500)
+      .json({ message: `Order status updation failed`, success: false });
+  }
+  res.status(200).json(result);
+}
+async function updateOrderStatusbyShopUuid(req, res) {
+  let _uuid = req.params.id;
+  let _shopUid = req.params.id;
+  console.log("req.params", req.params);
+  const reqbody = req.body;
+  let orderStatus = {
+    status: "received",
+  };
+  const result = await Orders.update(orderStatus, {
+    where: { orderUuid: _uuid, shop_uuid: _shopUid },
+  });
+  if (!result) {
+    res
+      .status(500)
+      .json({ message: `Order status updation failed`, success: false });
+  }
+  res.status(200).json(result);
+}
 //destroy
 async function destroyOrders(req, res) {
   let _uuid = req.params.id;
@@ -223,7 +262,7 @@ async function destroyOrders(req, res) {
 }
 async function totalSalesbyStatusShipped(req, res) {
   const totalSales = await Orders.sum("totalPrice", {
-    where: { status: "shipped" },
+    where: { status: "received" },
   });
 
   console.log("totalSales", totalSales);

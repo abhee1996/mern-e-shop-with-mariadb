@@ -20,11 +20,11 @@ const cardGap = 35;
 const cardWidth = (width - cardGap * 3) / 2;
 const ProductCarts = props => {
   const context = useContext(AuthGlobal);
-  const ShopId = context?.shopValue?.shopId;
-  const ShopUUId = context?.shopValue?.shop_uuid;
-  const UserId = context?.userValue?.userId;
+  const ShopId = context?.shopValue?.shop?.shopId;
+  const ShopUUId = context?.shopValue?.shop?.shop_uuid;
+  const UserId = context?.userValue?.user?.userId;
   const [color, setColor] = useState('green');
-  const {item, productImage, productCat} = props;
+  const {item, productImage} = props;
   const {name, sku, discription, price, countOnStock = 50} = item;
   const toast = useToast();
   const {container, card, title, cartPrice} = styles;

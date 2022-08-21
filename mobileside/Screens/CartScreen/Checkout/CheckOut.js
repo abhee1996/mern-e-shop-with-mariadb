@@ -22,8 +22,8 @@ import AppIconButton from '../../../Component/AppButtons/AppIconButton';
 import colors from '../../../config/colors';
 import Screen from '../../../Component/Screen';
 import AppPicker from '../../../Component/AppPicker/AppPicker';
-import * as RNImagePicker from 'react-native-image-picker';
-import mime from 'mime';
+// import * as RNImagePicker from 'react-native-image-picker';
+// import mime from 'mime';
 import {connect} from 'react-redux';
 import AuthGlobal from '../../../Redux/AuthStore/AuthGlobal';
 import {getUserProfile} from '../../../Redux/actions/Auth.Action';
@@ -46,15 +46,16 @@ const CheckOut = props => {
   const {cartItems} = props;
   console.log('O screen props?.route?.params', props?.route);
   const total = props?.route?.params?.total;
-  const UserId = context?.userValue?.userId;
-  const isUser = context?.userValue?.isUser;
+  const UserId = context?.userValue?.user?.userId;
+  const ShopId = context?.shopValue?.shop?.shopId;
+
+  const isUser = context?.userValue?.user?.isUser;
   useEffect(() => {
     setOrderItems(cartItems);
     getUserProfile(UserId).then(res => {
       setuserProfile(res);
     });
   }, []);
-  console.log('O userProfile=>', userProfile);
 
   const checkout = () => {
     let order = {

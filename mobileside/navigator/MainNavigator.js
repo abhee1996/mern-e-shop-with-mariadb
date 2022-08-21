@@ -16,14 +16,19 @@ import CartScreen from '../Screens/CartScreen/CartScreen';
 import CartIcon from '../Screens/CartScreen/CartIcon';
 import AuthGlobal from '../Redux/AuthStore/AuthGlobal';
 import OrdersScreen from '../Screens/OrderScreen/OrdersScreen';
+import {getFocusedRouteNameFromRoute} from '@react-navigation/core';
 const BottomTabStack = createBottomTabNavigator();
 
 const MainNavigator = () => {
   const context = useContext(AuthGlobal);
 
-  const UserId = context?.userValue?.userId;
-  const ShopId = context?.shopValue?.shopId;
-  console.log('ShopId', context?.shopValue);
+  const UserId = context?.userValue?.user?.userId;
+  const ShopId = context?.shopValue?.shop?.shopId;
+  const getTabBarStyle = route => {
+    const routeName = getFocusedRouteNameFromRoute(route) ?? 'Home';
+    let display = routeName === 'ChatScreen' ? 'none' : 'flex';
+    return {display};
+  };
   return (
     <BottomTabStack.Navigator
       screenOptions={{
@@ -38,9 +43,11 @@ const MainNavigator = () => {
       <BottomTabStack.Screen
         name="Home"
         component={HomeNavigation}
-        options={{
+        options={({route}) => ({
           tabBarActiveTintColor: '#03bafc',
           tabBarInactiveTintColor: 'grey',
+          tabBarStyle: getTabBarStyle(route),
+
           tabBarIcon: ({color, size, focused}) => {
             return (
               <View>
@@ -53,7 +60,7 @@ const MainNavigator = () => {
               </View>
             );
           },
-        }}
+        })}
       />
       {UserId ? (
         <>

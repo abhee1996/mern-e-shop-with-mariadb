@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "825340456257",
+    "project_id": "eshopmessaging",
+    "storage_bucket": "eshopmessaging.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:825340456257:android:e45902d4b11534e622c5c0",
+        "android_client_info": {
+          "package_name": "com.mobileside"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "825340456257-ko2qi81bqnmvm52jodljf55ckss80jns.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaDQR887UVLLtM7OMcu1gZsGb5W2RzF5I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "825340456257-ko2qi81bqnmvm52jodljf55ckss80jns.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

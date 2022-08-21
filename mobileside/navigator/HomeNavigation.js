@@ -13,6 +13,7 @@ import Confirms from '../Screens/CartScreen/Checkout/Confirms';
 import Payments from '../Screens/CartScreen/Checkout/Payments';
 import CartCheckoutTab from '../Screens/CartScreen/CheckoutTabs';
 import ChatScreen from '../Screens/ChatScreens/chat.screen';
+import InboxScreen from '../Screens/ChatScreens/InboxScreen';
 import DashboardScreen from '../Screens/DashboardScreen/DashboardScreen';
 import RegisterShop from '../Screens/DashboardScreen/RegisterShop';
 import OrdersScreen from '../Screens/OrderScreen/OrdersScreen';
@@ -24,37 +25,7 @@ import UserProfile from '../Screens/UserScreen/UserProfile';
 import UserScreen from '../Screens/UserScreen/UserScreen';
 
 const Stack = createStackNavigator();
-// const AllStackNavigator = (screen, component) => {
-//   let ScreenName = '';
-//   let ComponentName;
-//   useEffect(() => {
-//     if (screen == 'UserScreen') {
-//       ScreenName = screen;
-//       ComponentName = component;
-//     } else if (screen == 'ProductScreen') {
-//       ScreenName = screen;
-//       ComponentName = component;
-//     } else if (screen == 'AdminScreen') {
-//       ScreenName = screen;
-//       ComponentName = component;
-//     } else if (screen == 'CartScreen') {
-//       ScreenName = screen;
-//       ComponentName = component;
-//     }
-//   }, []);
 
-//   return (
-//     <Stack.Navigator>
-//       <Stack.Screen
-//         name={ScreenName}
-//         component={ComponentName}
-//         options={{
-//           headerShown: false,
-//         }}
-//       />
-//     </Stack.Navigator>
-//   );
-// };
 const ProductStackNavigator = () => {
   return (
     <Stack.Navigator>
@@ -73,8 +44,15 @@ const ProductStackNavigator = () => {
         }}
       />
       <Stack.Screen
-        name="InboxScreen"
+        name="ChatScreen"
         component={ChatScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="InboxScreen"
+        component={InboxScreen}
         options={{
           headerShown: false,
         }}
@@ -120,9 +98,9 @@ const AuthStackNavigator = () => {
 };
 const UserStackNavigator = () => {
   const context = useContext(AuthGlobal);
-  const UserId = context?.userValue?.userId;
-  console.log('UserStackNavigator UserId', UserId);
-  const ShopId = context?.shopValue?.shopId;
+  const UserId = context?.userValue?.user?.userId;
+  const ShopId = context?.shopValue?.shop?.shopId;
+
   return (
     <Stack.Navigator>
       {UserId ? (
@@ -171,19 +149,31 @@ const CartStackNavigator = () => {
   );
 };
 
-const InboxStackNavigator = () => {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="Inbox"
-        component={ChatScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-    </Stack.Navigator>
-  );
-};
+// const InboxStackNavigator = () => {
+//   return (
+//     <Stack.Navigator>
+//       <Stack.Screen
+//         name="ChatScreen"
+//         component={ChatScreen}
+//         options={
+//           (({route}) => {
+//             item: route.params;
+//           },
+//           {
+//             headerShown: false,
+//           })
+//         }
+//       />
+//       <Stack.Screen
+//         name="InboxScreen"
+//         component={InboxScreen}
+//         options={{
+//           headerShown: false,
+//         }}
+//       />
+//     </Stack.Navigator>
+//   );
+// };
 const AdminStackNavigator = () => {
   return (
     <Stack.Navigator>
@@ -199,7 +189,6 @@ const AdminStackNavigator = () => {
         component={AdminProduct}
         options={{
           headerShown: false,
-          // title: 'Products',
         }}
       />
       <Stack.Screen
@@ -226,6 +215,7 @@ const AdminStackNavigator = () => {
     </Stack.Navigator>
   );
 };
+
 const HomeNavigation = () => {
   return (
     <>
@@ -241,5 +231,5 @@ export {
   UserStackNavigator,
   AdminStackNavigator,
   CartStackNavigator,
-  InboxStackNavigator,
+  // InboxStackNavigator,
 };

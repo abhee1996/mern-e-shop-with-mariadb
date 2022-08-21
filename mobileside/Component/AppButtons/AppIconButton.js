@@ -21,7 +21,7 @@ const AppIconButton = ({
   name,
   title,
   size,
-
+  disabled,
   iconColor,
   IconStyle,
   borderRadius,
@@ -50,12 +50,14 @@ const AppIconButton = ({
   let bdRadius = borderRadius || 0;
   let bgColor = buttonBgColor; //|| colors.primarypro.primary800;
   let isIconMargin = mr + 0 || 5;
+  let disable = disabled || false;
   return (
     <SafeAreaView>
       <View>
         <TouchableOpacity
           onPress={onPress}
           onLongPress={onLongPress}
+          disabled={disable}
           onPressIn={onPressIn}
           onPressOut={onPressOut}
           style={[
@@ -118,13 +120,16 @@ const AppIconButton = ({
                   {iconAs === 'MaterialCommunityIcons' ? (
                     <>
                       <View
-                        style={{
-                          margin: 5,
-                          flexDirection: 'row',
-                          alignSelf: 'center',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}>
+                        style={[
+                          buttonStyle,
+                          {
+                            // margin: 5,
+                            // flexDirection: 'row',
+                            // alignSelf: 'center',
+                            // alignItems: 'center',
+                            // justifyContent: 'center',
+                          },
+                        ]}>
                         <MaterialCommunityIcons
                           style={[
                             IconStyle,

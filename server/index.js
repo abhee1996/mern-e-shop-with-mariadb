@@ -46,6 +46,9 @@ app.use(`${api}/order`, OrderRoutes);
 //CATEGORYS
 const categoryRoutes = require("./routes/categoryRoutes");
 app.use(`${api}/category`, categoryRoutes);
+//conversation
+const conversationsRoutes = require("./routes/ConversationsRoutes");
+app.use(`${api}/conversation`, conversationsRoutes);
 
 //TEST ROUTES
 app.get("/testing", (req, res) => {

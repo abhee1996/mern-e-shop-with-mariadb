@@ -59,15 +59,13 @@ const AdminProduct = props => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState();
   const context = useContext(AuthGlobal);
-  const isAuthenticated = context.stateUser.isAuthenticated;
-  const isShopAuthenticated = context.stateShop.isShopAuthenticated;
-  const ShopId = context?.shopValue?.shopId;
-  const ShopUUId = context?.shopValue?.shop_uuid;
-  console.log('isShopAuthenticated', isShopAuthenticated);
-  console.log('isAuthenticated', isAuthenticated);
+
+  const UserId = context?.userValue?.user?.userId;
+  const ShopId = context?.shopValue?.shop?.shopId;
+  const ShopUUId = context?.shopValue?.shop?.shop_uuid;
+
   var AdminProductURL = `${config.server}/product/getall/`;
   var filterShopProductURL = `${config.server}/product/getallProductBy/shopuuid/${ShopUUId}`;
-  // const getCatByProductCatId = `${config.server}/category/getallcategoriesBy/productcategoryId/${item?.category_uuid}`;
   useFocusEffect(
     useCallback(() => {
       //get Token
@@ -81,12 +79,6 @@ const AdminProduct = props => {
         setProductFilter(res.data);
         setLoading(false);
       });
-      // const catname = getCategoriesByProductCat(
-      //   setCatName,
-      //   getCatByProductCatId,
-      // );
-      // console.log('getCategoriesByProductCatId', getCategoriesByProductCatId);
-      // console.log('catname', catname);
     }, []),
   );
   const handleSearchProduct = text => {
@@ -146,12 +138,7 @@ const AdminProduct = props => {
                   />
                 }
                 InputRightElement={
-                  <Icon
-                    //onPress={() => setfocus(false)}
-                    as={<FontAwesome name="close" />}
-                    size={5}
-                    mr="2"
-                  />
+                  <Icon as={<FontAwesome name="close" />} size={5} mr="2" />
                 }
                 variant="rounded"
                 width="330"
@@ -233,7 +220,6 @@ const styles = StyleSheet.create({
   listH: {flexDirection: 'row', borderWidth: 2, paddingVertical: 10, margin: 4},
   listHText: {
     flexDirection: 'row',
-    // borderWidth: 1,
     paddingVertical: 10,
     marginHorizontal: 20,
   },

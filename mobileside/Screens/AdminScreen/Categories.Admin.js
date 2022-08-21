@@ -31,17 +31,13 @@ const AdminCategories = () => {
           <AppIconButton
             title="Submit"
             leftIcon={true}
-            // iconAs="FontAwesome"
-            // name="plus"
             //  onPress={() => props.navigation.navigate('AdminProductForm')}
             size={15}
-            // iconColor={colors.default.white}
             marginX="3.5%"
             marginY="7%"
             borderRadius={0}
             buttonBgColor={colors.successpro.success500}
             txtColor={colors.default.white}
-            // onPress={() => saveProduct()}
           />
         </View>
       </FormContainer>

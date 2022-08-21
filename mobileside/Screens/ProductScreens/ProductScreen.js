@@ -36,9 +36,10 @@ const ProductScreen = props => {
   const context = useContext(AuthGlobal);
   const shopValue = context?.shopValue;
   const userValue = context?.userValue;
-  const ShopId = shopValue?.shopId;
-  const shopuuid = shopValue?.shop_uuid;
-  const UserId = userValue?.userId;
+
+  const ShopId = shopValue?.shop?.shopId;
+  const shopuuid = shopValue?.shop?.shop_uuid;
+  const UserId = userValue?.user?.userId;
   const getAllProductURL = `${config.server}/product/getall/`;
   var filterShopProductURL = `${config.server}/product/getallProductBy/shopuuid/${shopuuid}`;
 

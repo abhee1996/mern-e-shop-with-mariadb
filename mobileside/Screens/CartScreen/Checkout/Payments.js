@@ -21,9 +21,9 @@ import AppIconButton from '../../../Component/AppButtons/AppIconButton';
 import colors from '../../../config/colors';
 import Screen from '../../../Component/Screen';
 import AppPicker from '../../../Component/AppPicker/AppPicker';
-import * as RNImagePicker from 'react-native-image-picker';
-import mime from 'mime';
-import {connect} from 'react-redux';
+// import * as RNImagePicker from 'react-native-image-picker';
+// import mime from 'mime';
+// import {connect} from 'react-redux';
 const {width, height} = Dimensions.get('window');
 const paymentMethod = [
   {name: 'Cash on Delivery', value: 1},

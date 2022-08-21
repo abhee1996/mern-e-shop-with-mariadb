@@ -9,6 +9,7 @@ import {
   Platform,
   ImageBackground,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import {useToast} from 'native-base';
 import React, {useContext, useEffect, useRef, useState} from 'react';
@@ -58,17 +59,18 @@ const AdminProductForm = props => {
   const [richDescription, setRichDescription] = useState();
   const [numReviews, setNumReviews] = useState(0);
   const [item, setItem] = useState();
+  const [loading, setLoading] = useState(true);
   const context = useContext(AuthGlobal);
 
   const shopValue = context.shopValue;
-  const shopValueData = shopValue.shopArr;
+
+  const shopValueData = shopValue.shop;
   const toast = useToast();
   let imgRef = React.createRef();
   const refRBSheet = useRef();
   let configDotServer = config.server;
   let propsRouteParams = props?.route?.params;
   let propItems = propsRouteParams?.item;
-  // console.log('propItems', propItems);
   const cloudinaryURL = `https://res.cloudinary.com/v1_1/masqsoft/image/upload`;
   // const permissionImagePicker = async () => {
   // if (Platform.OS !== 'web') {
@@ -80,8 +82,6 @@ const AdminProductForm = props => {
   // };
 
   const saveAction = (res, item) => {
-    console.log('saveNewProduct');
-
     try {
       if (res.status == 200) {
         toast.show({
@@ -128,7 +128,6 @@ const AdminProductForm = props => {
               x = {image: img[i].path, isNew: true};
               ImageData.push(x);
             }
-            console.log('ImageData?.length', ImageData?.length);
 
             setImage(ImageData);
           }
@@ -141,8 +140,8 @@ const AdminProductForm = props => {
 
   useEffect(() => {
     if (!props.route.params) {
-      // console.log('propsrouteparams', props.route.params);
       setItem(null);
+      setLoading(false);
     } else {
       setItem(propItems);
       setName(propItems?.name);
@@ -156,6 +155,7 @@ const AdminProductForm = props => {
       setCategoryId(propItems?.categoryId);
       setNumReviews(propItems?.numReviews);
       setRating(propItems?.rating);
+      setLoading(false);
     }
     let getproductImagesURL = `${configDotServer}/product/getproductImages/${propItems?.productUuid}`;
     getProductImages(getproductImagesURL)?.then(res => {
@@ -192,15 +192,16 @@ const AdminProductForm = props => {
       formdataproduct.append('sku', sku);
       formdataproduct.append('brand', brand);
       formdataproduct.append('description', description);
-      formdataproduct.append('Brand', richDescription);
+      formdataproduct.append('richDescription', richDescription);
       formdataproduct.append('price', price);
       formdataproduct.append('countInStock', countInStock);
       formdataproduct.append('rating', rating);
       formdataproduct.append('numReviews', numReviews);
       formdataproduct.append('isFeatured', isFeatured);
       formdataproduct.append('categoryId', categoryId);
-      formdataproduct.append('shop_uuid', shopValueData?.shopUuid);
-
+      formdataproduct.append('shop_uuid', shopValueData?.shop_uuid);
+      //hamza_fruits_juice_Pomegranate_1k red Pomegranate best taste
+      //hamza_fruits_juice_Pomegranate_1k red Pomegranate best taste
       const config = {
         headers: {
           // Accept: 'application/json',
@@ -209,8 +210,9 @@ const AdminProductForm = props => {
         },
       };
       if (item == undefined || null) {
-        console.log('new product--> item undefined|| null', item);
+        console.log('new product--> item undefined|| null');
         let newProductURL = `${configDotServer}/product/new/`;
+        console.log('formdataproduct', formdataproduct);
         const newResponse = await axios
           .post(newProductURL, formdataproduct, config)
           .then(res => {
@@ -257,7 +259,6 @@ const AdminProductForm = props => {
         ]}
         onPressOut={() => {
           ImagePicker();
-          // console.log('-------is multiimage', isMultiImage);
         }}>
         <Text //style={styles.panelButtonTitle}
         >
@@ -275,7 +276,6 @@ const AdminProductForm = props => {
     </View>
   );
   const ImageViewer = () => {
-    // console.log(' ImageViewer image length', image);
     return (
       <>
         <View
@@ -366,12 +366,53 @@ const AdminProductForm = props => {
   };
   return (
     <>
-      <KeyboardAwareScrollView
-        viewIsInsideTabBar={true}
-        // extraHeight={50}
-        enableOnAndroid={true}>
-        <FormContainer title={item ? 'Update Product ' : 'Add Product'}>
-          {/* <View style={styles.ImageContainer}>
+      {loading ? (
+        <>
+          <View style={styles.spinner}>
+            <ActivityIndicator size="large" color="red" />
+          </View>
+        </>
+      ) : (
+        <>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              backgroundColor: colors.voiletpro.violet500,
+              alignItems: 'center',
+              height: 55,
+              width: width,
+            }}>
+            <AppIconButton
+              leftIcon={true}
+              iconAs="MaterialIcons"
+              name="arrow-back"
+              width={-45}
+              height={23}
+              size={40}
+              style={{
+                right: item ? 68 : 90,
+              }}
+              buttonStyle={{
+                alignSelf: 'center',
+                justifyContent: 'center',
+                top: 9,
+              }}
+              iconColor={colors.default.white}
+              onPress={() => props.navigation.goBack()}
+            />
+            <Text
+              style={{color: colors.default.white, right: 23, fontSize: 30}}>
+              {item ? 'Update Product ' : 'Add Product'}
+            </Text>
+          </View>
+          <KeyboardAwareScrollView
+            viewIsInsideTabBar={true}
+            enableOnAndroid={true}>
+            <FormContainer
+            //title={item ? 'Update Product ' : 'Add Product'}
+            >
+              {/* <View style={styles.ImageContainer}>
             <Image style={styles.Image} source={{uri: mainImage}} />
             <TouchableOpacity
               onPress={() => {
@@ -384,105 +425,109 @@ const AdminProductForm = props => {
               <FontAwesome name="camera" style={{color: 'white'}} />
             </TouchableOpacity>
           </View> */}
-          <InputField
-            placeholder="Brand"
-            name="brand"
-            id={'brand'}
-            value={brand}
-            islabel={true}
-            label={'Brand'}
-            labelStyle={styles.label}
-            onChangeText={text => setBrand(text)}
-          />
-          <InputField
-            placeholder="Name"
-            name="name"
-            id={'name'}
-            value={name}
-            islabel={true}
-            label={'Name'}
-            labelStyle={styles.label}
-            onChangeText={text => setName(text)}
-          />
-          <InputField
-            placeholder="Price"
-            name="price"
-            id={'price'}
-            value={price}
-            islabel={true}
-            label={'Price'}
-            labelStyle={styles.label}
-            keyboardType={'numeric'}
-            onChangeText={text => setPrice(text)}
-          />
-          <InputField
-            placeholder="Stock"
-            name="stock"
-            id={'stock'}
-            value={countInStock}
-            islabel={true}
-            label={'Count in Stock'}
-            keyboardType={'numeric'}
-            labelStyle={styles.label}
-            onChangeText={text => setCountInStock(text)}
-          />
+              <InputField
+                placeholder="Brand"
+                name="brand"
+                id={'brand'}
+                value={brand}
+                islabel={true}
+                label={'Brand'}
+                labelStyle={styles.label}
+                onChangeText={text => setBrand(text)}
+              />
+              <InputField
+                placeholder="Name"
+                name="name"
+                id={'name'}
+                value={name}
+                islabel={true}
+                label={'Name'}
+                labelStyle={styles.label}
+                onChangeText={text => setName(text)}
+              />
+              <InputField
+                placeholder="Price"
+                name="price"
+                id={'price'}
+                value={price}
+                islabel={true}
+                label={'Price'}
+                labelStyle={styles.label}
+                keyboardType={'numeric'}
+                onChangeText={text => setPrice(text)}
+              />
+              <InputField
+                placeholder="Stock"
+                name="stock"
+                id={'stock'}
+                value={countInStock}
+                islabel={true}
+                label={'Count in Stock'}
+                keyboardType={'numeric'}
+                labelStyle={styles.label}
+                onChangeText={text => setCountInStock(text)}
+              />
 
-          <InputField
-            placeholder="SKU"
-            name="sku"
-            id={'sku'}
-            value={sku}
-            islabel={true}
-            label={'Sku'}
-            labelStyle={styles.label}
-            onChangeText={text => setSku(text)}
-          />
-          <InputField
-            placeholder="Description"
-            name="description"
-            id={'description'}
-            value={description}
-            islabel={true}
-            label={'Description'}
-            labelStyle={styles.label}
-            onChangeText={text => setDescription(text)}
-          />
-          <View style={{marginTop: 10}}>
-            <AppPicker
-              selectedValue={pickerValue}
-              pickerStyle={styles.picker}
-              prickerItemStyle={styles.pickerItem}
-              onValueChange={item => {
-                console.log('cate item', item);
-                setPickerValue(item), setCategory(item), setCategoryId(item);
-              }}
-              dataArray={categories}
-              placeholder={'Select Category'}
-              pickerWidth={320}
-            />
-          </View>
-          <View>{error ? <Error message={error} /> : null}</View>
-          <View>
-            <ImageViewer />
-          </View>
-          <View style={styles.buttonContainer}>
-            <AppIconButton
-              title="Save"
-              leftIcon={true}
-              size={15}
-              marginX="3.5%"
-              marginY="7%"
-              borderRadius={0}
-              buttonBgColor={colors.successpro.success500}
-              txtColor={colors.default.white}
-              onPress={() => saveProduct()}
-            />
-          </View>
-        </FormContainer>
-      </KeyboardAwareScrollView>
-      <AppDrawer refRBSheet={refRBSheet}>
-        <RenderInner />
-      </AppDrawer>
+              <InputField
+                placeholder="SKU"
+                name="sku"
+                id={'sku'}
+                value={sku}
+                islabel={true}
+                label={'Sku'}
+                labelStyle={styles.label}
+                onChangeText={text => setSku(text)}
+              />
+              <InputField
+                placeholder="Description"
+                name="description"
+                id={'description'}
+                value={description}
+                islabel={true}
+                label={'Description'}
+                labelStyle={styles.label}
+                onChangeText={text => setDescription(text)}
+              />
+              <View style={{marginTop: 10}}>
+                <AppPicker
+                  selectedValue={pickerValue}
+                  pickerStyle={styles.picker}
+                  prickerItemStyle={styles.pickerItem}
+                  onValueChange={item => {
+                    console.log('cate item', item);
+                    setPickerValue(item),
+                      setCategory(item),
+                      setCategoryId(item);
+                  }}
+                  dataArray={categories}
+                  placeholder={'Select Category'}
+                  pickerWidth={320}
+                />
+              </View>
+              <View>{error ? <Error message={error} /> : null}</View>
+              <View>
+                <ImageViewer />
+              </View>
+              <View style={styles.buttonContainer}>
+                <AppIconButton
+                  title="Save"
+                  leftIcon={true}
+                  size={15}
+                  marginX="3.5%"
+                  marginY="7%"
+                  borderRadius={0}
+                  buttonBgColor={colors.successpro.success500}
+                  txtColor={colors.default.white}
+                  onPress={() => saveProduct()}
+                />
+              </View>
+            </FormContainer>
+          </KeyboardAwareScrollView>
+          <AppDrawer refRBSheet={refRBSheet}>
+            <RenderInner />
+          </AppDrawer>
+        </>
+      )}
     </>
   );
 };
@@ -503,6 +548,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 600,
     borderWidth: 0,
+  },
+  spinner: {
+    height: height / 2,
+    alignSelf: 'center',
   },
   addImgButton: {
     height: 100,

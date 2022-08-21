@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {Dimensions, StyleSheet, Text, View} from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import FormContainer from '../../Component/FormContainer';
@@ -12,9 +12,11 @@ import axios from 'axios';
 import AuthGlobal from '../../Redux/AuthStore/AuthGlobal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useToast} from 'native-base';
+import * as Yup from 'yup';
 import {getShopDetail} from '../../Redux/actions/ShopAuth.action';
 import {saveCurrentShop} from '../../Redux/actions/ShopAuth.action';
-
+import {ActivityIndicator} from 'react-native';
+const {width, height} = Dimensions.get('window');
 const RegisterShop = props => {
   const [error, setError] = useState('');
   const [name, setName] = useState('');
@@ -27,17 +29,24 @@ const RegisterShop = props => {
   const [address, setAddress] = useState('');
   const [shop, setShop] = useState();
   const [token, setToken] = useState();
+  const [loading, setLoading] = useState(true);
   const context = useContext(AuthGlobal);
   const toast = useToast();
 
   const shopValue = context?.shopValue;
-  const shopId = shopValue?.shopId;
-  let shopData;
-  const isShopAuthenticated = props?.isShopAuthenticated;
+  const UserId = context?.userValue?.user?.userId;
 
+  const shopId = shopValue?.shop?.shopId;
+
+  const isShopAuthenticated = props?.isShopAuthenticated;
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required().label('Name'),
+    email: Yup.string().required().label('Email'),
+  });
   useEffect(() => {
     if (!shopValue) {
       setShop(null);
+      setLoading(false);
     } else {
       getShopDetail(shopId).then(_res => {
         setShop(_res),
@@ -48,8 +57,10 @@ const RegisterShop = props => {
         setDiscription(_res?.discription);
         setType(_res?.type);
         setAddress(_res?.place);
+        setLoading(false);
       });
     }
+    console.log('validationSchema', validationSchema);
     AsyncStorage.getItem('shop_jwt')
       .then(res => {
         setToken(res);
@@ -110,6 +121,7 @@ const RegisterShop = props => {
         };
         saveCurrentShop(isShopAuthenticated, putshop, shopId).then(_res => {
           shopAction(_res);
+          setLoading(false);
         });
       } else {
         console.log('register new shop');
@@ -120,174 +132,183 @@ const RegisterShop = props => {
           password: password,
           number: number,
         };
-        console.log('newshop', newshop);
+
         saveCurrentShop(isShopAuthenticated, newshop).then(_res => {
           shopAction(_res);
+          setLoading(false);
         });
+        context?.registerWithFireStore(name, email, password, false, true);
       }
     }
   };
 
   return (
     <View>
-      {isShopAuthenticated ? (
+      {loading ? (
         <>
-          <KeyboardAwareScrollView
-            viewIsInsideTabBar={true}
-            extraHeight={200}
-            enableOnAndroid={true}>
-            <FormContainer title=" Shop Profile">
-              <InputField
-                placeholder="Name"
-                name="name"
-                value={name}
-                id={'name'}
-                onChangeText={text => setName(text)}
-              />
-              <InputField
-                placeholder="Owner Name"
-                name="owner"
-                value={owner}
-                id={'owner'}
-                onChangeText={text => setOwner(text)}
-              />
-              <InputField
-                placeholder="Email "
-                name="email"
-                value={email}
-                id={'email'}
-                onChangeText={text => setEmail(text.toLowerCase())}
-              />
-
-              <InputField
-                placeholder="Phone Number"
-                name="number"
-                id={'number'}
-                // value={number}
-                value={number?.toString()}
-                keyboardType={'numeric'}
-                onChangeText={text => setNumber(text)}
-              />
-              <InputField
-                placeholder="Type"
-                name="type"
-                value={type}
-                id={'type'}
-                onChangeText={text => setType(text.toLowerCase())}
-              />
-              <InputField
-                placeholder="Discription"
-                name="discription"
-                value={discription}
-                id={'discription'}
-                onChangeText={text => setDiscription(text)}
-              />
-
-              <InputField
-                placeholder="Address"
-                name="place"
-                value={address}
-                id={'place'}
-                onChangeText={text => setAddress(text)}
-              />
-
-              <View>{error ? <Error message={error} /> : null}</View>
-              <View>
-                <AppIconButton
-                  title="Save"
-                  size={25}
-                  width={25}
-                  height={4}
-                  marginX="3%"
-                  marginY="1%"
-                  borderRadius={0}
-                  buttonBgColor={colors.successpro.success500}
-                  txtColor={colors.default.white}
-                  onPress={() => saveShop()}
-                />
-              </View>
-            </FormContainer>
-          </KeyboardAwareScrollView>
+          <View style={styles.spinner}>
+            <ActivityIndicator size="large" color="red" />
+          </View>
         </>
       ) : (
         <>
-          <KeyboardAwareScrollView
-            viewIsInsideTabBar={true}
-            extraHeight={200}
-            enableOnAndroid={true}>
-            <FormContainer
-              title="Create Shop Account"
-              //style={{borderWidth: 4, marginBottom: 0}}
-            >
-              <InputField
-                placeholder="Name"
-                name="name"
-                value={name}
-                id={'name'}
-                onChangeText={text => setName(text)}
-              />
-              <InputField
-                placeholder="Owner Name"
-                name="owner"
-                value={owner}
-                id={'owner'}
-                onChangeText={text => setOwner(text)}
-              />
-              <InputField
-                placeholder="Email "
-                name="email"
-                value={email}
-                id={'email'}
-                onChangeText={text => setEmail(text.toLowerCase())}
-              />
-              <InputField
-                placeholder="Password"
-                name="password"
-                value={password}
-                id={'password'}
-                secureTextEntry={true}
-                onChangeText={text => setPassword(text)}
-              />
-              <InputField
-                placeholder=" Number"
-                name="number"
-                id={'number'}
-                value={number?.toString()}
-                keyboardType={'numeric'}
-                onChangeText={text => setNumber(text)}
-              />
+          {isShopAuthenticated ? (
+            <>
+              <KeyboardAwareScrollView
+                viewIsInsideTabBar={true}
+                extraHeight={360}
+                enableOnAndroid={true}>
+                <FormContainer>
+                  <InputField
+                    placeholder="Name"
+                    name="name"
+                    value={name}
+                    id={'name'}
+                    onChangeText={text => setName(text)}
+                  />
+                  <InputField
+                    placeholder="Owner Name"
+                    name="owner"
+                    value={owner}
+                    id={'owner'}
+                    onChangeText={text => setOwner(text)}
+                  />
+                  <InputField
+                    placeholder="Email "
+                    name="email"
+                    value={email}
+                    id={'email'}
+                    onChangeText={text => setEmail(text.toLowerCase())}
+                  />
 
-              <View>{error ? <Error message={error} /> : null}</View>
-              <View>
-                <AppIconButton
-                  title="Register as Shop"
-                  size={25}
-                  width={25}
-                  height={4}
-                  marginX="3%"
-                  marginY="1%"
-                  borderRadius={0}
-                  buttonBgColor={colors.successpro.success500}
-                  txtColor={colors.default.white}
-                  onPress={() => saveShop()}
-                />
-              </View>
-              <View>
-                <AppIconButton
-                  title="Login as Shop"
-                  size={25}
-                  width={25}
-                  height={4}
-                  marginX="3%"
-                  marginY="1%"
-                  borderRadius={0}
-                  buttonBgColor={colors.warningpro.warning500}
-                  txtColor={colors.default.white}
-                  onPress={() => props.navigation.navigate('Login')}
-                />
-              </View>
-            </FormContainer>
-          </KeyboardAwareScrollView>
+                  <InputField
+                    placeholder="Phone Number"
+                    name="number"
+                    id={'number'}
+                    // value={number}
+                    value={number?.toString()}
+                    keyboardType={'numeric'}
+                    onChangeText={text => setNumber(text)}
+                  />
+                  <InputField
+                    placeholder="Type"
+                    name="type"
+                    value={type}
+                    id={'type'}
+                    onChangeText={text => setType(text.toLowerCase())}
+                  />
+                  <InputField
+                    placeholder="Discription"
+                    name="discription"
+                    value={discription}
+                    id={'discription'}
+                    onChangeText={text => setDiscription(text)}
+                  />
+
+                  <InputField
+                    placeholder="Address"
+                    name="place"
+                    value={address}
+                    id={'place'}
+                    onChangeText={text => setAddress(text)}
+                  />
+
+                  <View>{error ? <Error message={error} /> : null}</View>
+                  <View>
+                    <AppIconButton
+                      title="Save"
+                      size={25}
+                      width={25}
+                      height={4}
+                      marginX="3%"
+                      marginY="1%"
+                      borderRadius={0}
+                      buttonBgColor={colors.successpro.success500}
+                      txtColor={colors.default.white}
+                      onPress={() => saveShop()}
+                    />
+                  </View>
+                </FormContainer>
+              </KeyboardAwareScrollView>
+            </>
+          ) : (
+            <>
+              <KeyboardAwareScrollView
+                viewIsInsideTabBar={true}
+                extraHeight={200}
+                enableOnAndroid={true}>
+                <FormContainer title="Create Shop Account">
+                  <InputField
+                    placeholder="Shop Name"
+                    name="name"
+                    value={name}
+                    id={'name'}
+                    onChangeText={text => setName(text)}
+                  />
+                  {/* <InputField
+                    placeholder="Owner Name"
+                    name="owner"
+                    value={owner}
+                    id={'owner'}
+                    onChangeText={text => setOwner(text)}
+                  /> */}
+                  <InputField
+                    placeholder="Email "
+                    name="email"
+                    value={email}
+                    id={'email'}
+                    onChangeText={text => setEmail(text.toLowerCase())}
+                  />
+                  <InputField
+                    placeholder="Password"
+                    name="password"
+                    value={password}
+                    id={'password'}
+                    secureTextEntry={true}
+                    onChangeText={text => setPassword(text)}
+                  />
+                  {/* <InputField
+                    placeholder=" Number"
+                    name="number"
+                    id={'number'}
+                    value={number?.toString()}
+                    keyboardType={'numeric'}
+                    onChangeText={text => setNumber(text)}
+                  /> */}
+
+                  <View>{error ? <Error message={error} /> : null}</View>
+                  <View>
+                    <AppIconButton
+                      title="Register as Shop"
+                      size={25}
+                      width={25}
+                      height={4}
+                      marginX="3%"
+                      marginY="1%"
+                      borderRadius={0}
+                      buttonBgColor={colors.successpro.success500}
+                      txtColor={colors.default.white}
+                      onPress={() => saveShop()}
+                    />
+                  </View>
+                  <View>
+                    <AppIconButton
+                      title="Login as Shop"
+                      size={25}
+                      width={25}
+                      height={4}
+                      marginX="3%"
+                      marginY="1%"
+                      borderRadius={0}
+                      buttonBgColor={colors.warningpro.warning500}
+                      txtColor={colors.default.white}
+                      onPress={() => props.navigation.navigate('Login')}
+                    />
+                  </View>
+                </FormContainer>
+              </KeyboardAwareScrollView>
+            </>
+          )}
         </>
       )}
     </View>
@@ -296,7 +317,12 @@ const RegisterShop = props => {
 
 export default RegisterShop;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  spinner: {
+    height: height / 2,
+    alignSelf: 'center',
+  },
+});
 // const saveShop = async () => {
 // let registerShopURL = `${config.server}/shop/auth/new`;
 // let updateShopURL = `${config.server}/shop/put/${shopId}`;

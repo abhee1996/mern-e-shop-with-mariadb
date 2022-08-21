@@ -30,57 +30,36 @@ const newColorTheme = {
     700: '#b3bef6',
   },
 };
-const getAsyncData = async (setUser, setShop, setAuthContext) => {
+const getAsyncData = async () => {
+  //setUser, setShop, setAuthContext) => {
   try {
     // await  AsyncStorage.getItem('shop_jwt').then(res => {
-
     // });
-    await AsyncStorage.getItem('shop_jwt_decoded').then(res => {
-      setShop(JSON.parse(res));
-    });
-    // for user
-    await AsyncStorage.getItem('user_jwt_decoded').then(res => {
-      setUser(JSON.parse(res));
-    });
+    // await AsyncStorage.getItem('shop_jwt_decoded').then(res => {
+    //   setShop(JSON.parse(res));
+    // });
+    // // for user
+    // await AsyncStorage.getItem('user_jwt_decoded').then(res => {
+    //   setUser(JSON.parse(res));
+    // });
+    await SplashScreen.hide();
   } catch (error) {
     console.warn(error);
   } finally {
-    await SplashScreen.hide();
   }
 };
 const theme = extendTheme({colors: newColorTheme});
 export default function Main() {
   const context = React.useContext(AuthGlobal);
-  console.log('Main indexJs context', context);
   const [user, setUser] = React.useState(null);
   const [shop, setShop] = React.useState(null);
-  const [userValue, setUserValue] = React.useState(null);
-  const [shopValue, setShopValue] = React.useState(null);
-  const [authContext, setAuthContext] = React.useState(null);
-
   React.useEffect(() => {
-    getAsyncData(setUser, setShop, setAuthContext);
-    // getUserProfile(user?.userId).then(res => {
-    //   console.log('ndexJS getUserProfile', res);
-    //   setUserValue(res);
-    // });
-    // getUserProfile(user?.userId).then(res => {
-    //   console.log('ndexJS getUserProfile', res);
-    //   setUserValue(res);
-    // });
-
-    console.log('indexJs user', user);
-    console.log('indexJs shop', shop);
+    getAsyncData(); //(setUser, setShop, setAuthContext);
+    //SplashScreen.hide();
   }, []);
-  // const userValue = React.useMemo(() => ({user, setUser}), [user, setUser]);
-  // const shopValue = React.useMemo(() => ({shop, setShop}), [shop, setShop]);
 
   return (
-    <Auth
-      userValue={user}
-      shopValue={shop}
-      // contextValue={contextValue}
-    >
+    <Auth>
       <Provider store={store}>
         <NativeBaseProvider theme={theme}>
           <App />

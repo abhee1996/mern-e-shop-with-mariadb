@@ -12,6 +12,8 @@ import {NavigationContainer} from '@react-navigation/native';
 import MainNavigator from './navigator/MainNavigator';
 import {AuthStackNavigator} from './navigator/HomeNavigation';
 import AuthGlobal from './Redux/AuthStore/AuthGlobal';
+import auth from '@react-native-firebase/auth';
+
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 // const getdata = async (setShop, setUser, setToken) => {
 //   await AsyncStorage.getItem('shop_jwt').then(res => {
@@ -29,54 +31,48 @@ import AuthGlobal from './Redux/AuthStore/AuthGlobal';
 LogBox.ignoreAllLogs(true);
 const App = () => {
   const context = useContext(AuthGlobal);
-  const ShopId = context?.shopValue?.shopId || null;
-  console.log('ShopId App.js', ShopId);
-  const UserId = context?.userValue?.userId || null;
-  console.log('UserId App.js', UserId);
-
-  if (UserId === null && ShopId === null) {
-    console.log(' if !UserId && !ShopId null'); //, UserId, ShopId);
-    return (
-      <NavigationContainer>
-        <AuthStackNavigator />
-      </NavigationContainer>
-    );
+  const ShopId = context?.shopValue?.shop?.shopId || null;
+  const UserId = context?.userValue?.user?.userId || null;
+  const [initializing, setInitializing] = useState(null);
+  function onAuthStateChanged(user) {
+    context?.setFirestoreUser(user);
+    if (initializing) setInitializing(false);
   }
-  // else if (UserId === undefined && ShopId === undefined) {
-  //   console.log(' if !UserId && !ShopId undefined'); //, UserId, ShopId);
-  //   return (
-  //     <NavigationContainer>
-  //       <AuthStackNavigator />
-  //     </NavigationContainer>
-  //   );
-  // }
-  else if (UserId) {
-    console.log(' if  !ShopId');
+  useEffect(() => {
+    const subscribe = auth().onAuthStateChanged(onAuthStateChanged);
 
-    return (
+    return subscribe;
+  }, []);
+  if (initializing) return null;
+
+  return (
+    <>
       <NavigationContainer>
-        <Header />
-        <MainNavigator />
+        {/* {context?.firestoreUser && UserId ? ( */}
+        {UserId ? (
+          <>
+            <Header />
+            <MainNavigator />
+          </>
+        ) : // ) : context?.firestoreUser && ShopId ? (
+        ShopId ? (
+          <>
+            <Header />
+            <MainNavigator />
+          </>
+        ) : (
+          <AuthStackNavigator />
+        )}
       </NavigationContainer>
-    );
-  } else if (ShopId) {
-    console.log(' if UserId && ShopId');
-
-    return (
-      <>
-        <NavigationContainer>
-          <Header />
-          <MainNavigator />
-        </NavigationContainer>
-      </>
-    );
-  } else {
-    return (
-      <View>
-        <Text> no app</Text>
-      </View>
-    );
-  }
+    </>
+  );
 };
 
 export default App;
+// } else {
+//   return (
+//     <View>
+//       <Text> no app</Text>
+//     </View>
+//   );
+// }

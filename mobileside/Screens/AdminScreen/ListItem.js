@@ -41,8 +41,6 @@ const AdminProductListItem = props => {
     getCategoriesByProductCat(getCatByProductCatURL).then(res => {
       setCatName(res.data[0]);
     });
-
-    console.log(`catName${index}`, catName);
   }, []);
 
   return (
@@ -228,7 +226,6 @@ const AdminProductListItem = props => {
                     },
                   ]}>
                   <AppIconButton
-                    // title="Edit"
                     leftIcon={true}
                     width={-55}
                     iconAs="MaterialIcons"
@@ -243,14 +240,12 @@ const AdminProductListItem = props => {
                     IconStyle={{left: 3}}
                     size={25}
                     iconColor={colors.default.white}
-                    // marginX="3.5%"
                     marginY="5.5%"
                     borderRadius={10}
                     buttonBgColor={colors.blue.blue400}
                     txtColor={colors.default.white}
                   />
                   <AppIconButton
-                    //title="Delete"
                     leftIcon={true}
                     iconAs="MaterialIcons"
                     name="delete"
@@ -258,7 +253,6 @@ const AdminProductListItem = props => {
                     width={-60}
                     size={25}
                     iconColor={colors.default.white}
-                    // marginX="3.5%"
                     marginY="5.5%"
                     borderRadius={10}
                     IconStyle={{left: 3}}
