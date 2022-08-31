@@ -16,16 +16,17 @@ import KeyboardViewSpacer from 'react-native-keyboard-view-space/lib';
 import colors from '../../config/colors';
 import {RenderSend} from '../../Screens/ChatScreens/chat.screen';
 import AppIconButton from '../AppButtons/AppIconButton';
+import {RenderComposer} from '../AppChatComponents/InputToolbar';
 // import KeyboardSpacer from 'react-native-keyboard-spacer';
 const {width, height} = Dimensions.get('window');
 
 // import ImagePicker from "react-native-image-crop-picker";
 // import { Overlay } from "react-native-elements";
 
-function MessageInput({onSend, setIsTyping, props}) {
+function MessageInput({value, onSend, setIsTyping, props}) {
   const [modalVisible, setModalVisible] = useState(false);
   const [imageModalVisible, setImageModalVisible] = useState(false);
-  const [value, setValue] = useState('');
+  // const [value, setValue] = useState('');
   // console.log('props', props);
   const pickImage = async () => {
     ImagePicker.openPicker({
@@ -57,7 +58,7 @@ function MessageInput({onSend, setIsTyping, props}) {
   const sendMessage = () => {
     onSend(value);
     // onSend(value, 'text');
-    // setValue('');
+    setValue('');
     Keyboard.dismiss();
     setIsTyping(false);
   };
@@ -72,10 +73,14 @@ function MessageInput({onSend, setIsTyping, props}) {
           value={value}
           placeholder="Your message here..."
           onChangeText={text => setValue(text)}
+          onTouchStart={() => {
+            setIsTyping(true);
+          }}
           onFocus={() => {
-            props.setIsTyping(true);
+            setIsTyping(true);
           }}
         />
+        <RenderSend />
         {/* {renderSend} */}
         {/* <RenderSend {...props} /> */}
         {/* <AppIconButton

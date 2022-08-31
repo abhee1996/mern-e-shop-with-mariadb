@@ -32,9 +32,12 @@ import AuthGlobal from '../../Redux/AuthStore/AuthGlobal';
 const {width, height} = Dimensions.get('window');
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
+  RenderActions,
   renderActions,
+  RenderComposer,
   renderComposer,
   renderInputToolbar,
+  RenderSend,
   renderSend,
 } from '../../Component/AppChatComponents/InputToolbar';
 import {
@@ -166,6 +169,7 @@ const ChatScreen = props => {
   const [showSpinner, setShowSpinner] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
   const [text, setText] = useState('');
+  const [value, setValue] = useState('');
 
   const userUid =
     context?.userValue?.user?.user_uid || item.senderId || userUUid;
@@ -284,6 +288,7 @@ const ChatScreen = props => {
         ...mymsg,
         createdAt: firestore.FieldValue.serverTimestamp(),
       });
+    setText('');
     // console.log('finalMsg', finalMsg);
   }, []);
   //----dome chat code end---///
@@ -711,7 +716,7 @@ const ChatScreen = props => {
             <></>
           )}
 
-          <View style={{height: height / 1.38}}>
+          <View style={{height: height / 1.25}}>
             {/* {messages?.length === 0 ? (
               <>
                 <ActivityIndicator size="large" color="red" />
@@ -742,17 +747,31 @@ const ChatScreen = props => {
                     bottomOffset={26}
                     // onPressAvatar={console.log}
                     renderInputToolbar={renderInputToolbar}
-                    renderActions={renderActions}
-                    renderComposer={renderComposer}
-                    setIsTyping={setIsTyping}
+                    renderActions={RenderActions}
+                    renderComposer={RenderComposer}
+                    onPress={() => {
+                      setIsTyping(true);
+                    }}
+                    // renderInputToolbar={() => {
+                    //   return (
+                    //     <MessageInput
+                    //       setValue={setValue}
+                    //       value={value}
+                    //       setIsTyping={setIsTyping}
+                    //       onSend={onSend}
+                    //     />
+                    //   );
+                    // }}
+                    // setIsTyping={setIsTyping}
                     // renderComposer={props => {
                     //   <MessageInput
                     //     {...props}
-                    //     //onSend={onSend}
+                    //     onSend={onSend}
+                    //     setValue={setValue}
                     //     setIsTyping={setIsTyping}
                     //   />;
                     // }}
-                    renderSend={renderSend}
+                    renderSend={RenderSend}
                     renderAvatar={null}
                     // renderAccessory={renderAccessory}
                     renderBubble={renderBubble}
