@@ -200,6 +200,7 @@ const Register = props => {
                     name="password"
                     value={password}
                     id={'password'}
+                    password
                     secureTextEntry={true}
                     onChangeText={text => setPassword(text)}
                   />

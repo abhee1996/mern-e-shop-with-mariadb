@@ -16,7 +16,7 @@ import {Dimensions} from 'react-native';
 import PushNotification from 'react-native-push-notification';
 
 import AppIconButton from '../../Component/AppButtons/AppIconButton';
-import {GiftedChat, Bubble, Send} from 'react-native-gifted-chat';
+import {GiftedChat, Bubble, Send, Composer} from 'react-native-gifted-chat';
 import MessageInput from '../../Component/MessageInput/MessageInput';
 import colors from '../../config/colors';
 import config from '../../config/config';
@@ -24,11 +24,26 @@ import axios from 'axios';
 import {LogBox} from 'react-native';
 import {Keyboard} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import KeyboardViewSpacer from 'react-native-keyboard-view-space';
+// import KeyboardSpacer from 'react-native-keyboard-spacer';
 
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import AuthGlobal from '../../Redux/AuthStore/AuthGlobal';
 const {width, height} = Dimensions.get('window');
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  renderActions,
+  renderComposer,
+  renderInputToolbar,
+  renderSend,
+} from '../../Component/AppChatComponents/InputToolbar';
+import {
+  renderCustomView,
+  renderMessage,
+  renderMessageText,
+  renderSystemMessage,
+} from '../../Component/AppChatComponents/MessageContainer';
+import AppAccessoryBar from '../../Component/AppChatComponents/AppAccessoryBar';
 
 async function getChat(conversation_id, userId) {
   // const url = `${config.server}api/message/getChat?conversationId=${conversation_id}&userId=${userId}&name=receiver`;
@@ -129,7 +144,6 @@ const renderBubble = props => {
 const ChatScreen = props => {
   const context = useContext(AuthGlobal);
   const {firestoreUser} = context;
-  // console.log('context', context);
   const [messages, setMessages] = useState();
   const {
     conversationId,
@@ -144,12 +158,15 @@ const ChatScreen = props => {
     number,
     item,
   } = props?.route?.params;
-  console.log('props?.route?.params;', props?.route?.params);
+  // console.log('props?.route?.params;', props?.route?.params);
   const [isSeenData, setIsSeenData] = useState();
   const [chatRange, setChatRange] = useState(20);
   const [msgIds, setMsgIds] = useState([]);
   const [showDelete, setShowDelete] = useState(false);
   const [showSpinner, setShowSpinner] = useState(true);
+  const [isTyping, setIsTyping] = useState(false);
+  const [text, setText] = useState('');
+
   const userUid =
     context?.userValue?.user?.user_uid || item.senderId || userUUid;
   const ShopId =
@@ -157,10 +174,7 @@ const ChatScreen = props => {
     item?.shopUuid ||
     item?.receiverId ||
     shopUUid;
-  console.log('chatList', chatList);
-  console.log('userName[1]', userName);
-  console.log('ShopId', ShopId);
-  console.log('__item_', item, '_userUUid', userUid);
+
   const getFurtherMessages = () => {
     // getChat(conversationId, senderId).then(data => {
     //   setMessages(
@@ -176,7 +190,7 @@ const ChatScreen = props => {
   useEffect(() => {
     const interval = setInterval(() => {
       const docId = 'chatroom' + userUid?.slice(4) + '-' + ShopId?.slice(4);
-      console.log('docId', docId, 'docId', docId.length);
+      // console.log('docId', docId, 'docId', docId.length);
       const messageSnapShot = firestore()
         .collection('eshop')
         .doc('eShop-hV1O5KpI9ZhoOqjA0CuZqcJfdyl2')
@@ -203,11 +217,25 @@ const ChatScreen = props => {
         });
         setMessages(allMessages);
       });
-    }, 4000);
+    }, 10000);
     return () => {
       clearInterval(interval);
     };
   }, []);
+  // const renderComposer = props => (
+  //   <View
+  //     onResponderStart={() => {
+  //       setIsTyping(true);
+  //     }}>
+  //     <Composer
+  //       {...props}
+  //       onPress={() => setIsTyping(true)}
+  //       textInputStyle={styles.textInputStyle}
+  //     />
+
+  //     {/* <MessageInput {...props} onSend={onSend} setIsTyping={setIsTyping} /> */}
+  //   </View>
+  // );
   const onSend = useCallback((messages = []) => {
     const msg = messages[0];
     const mymsg = {
@@ -256,7 +284,7 @@ const ChatScreen = props => {
         ...mymsg,
         createdAt: firestore.FieldValue.serverTimestamp(),
       });
-    console.log('finalMsg', finalMsg);
+    // console.log('finalMsg', finalMsg);
   }, []);
   //----dome chat code end---///
   useEffect(() => {
@@ -500,53 +528,53 @@ const ChatScreen = props => {
       contentOffset.y
     );
   };
-  const renderSend = props => {
-    const {text} = props;
-    return (
-      <Send {...props} alwaysShowSend={true}>
-        <View
-          style={{
-            height: 45,
-            width: 70,
-          }}>
-          <AppIconButton
-            leftIcon={true}
-            iconAs="MaterialIcons"
-            name="attachment"
-            width={-45}
-            height={-23}
-            size={22}
-            txtColor={colors.default.white}
-            iconColor={colors.amber.amber300}
-            style={[
-              {
-                top: 22,
-                right: 20,
-              },
-            ]}
-            // onPress={() => {
-            //    setModalVisible(true)
-            // }}
-          />
-          <AppIconButton
-            leftIcon={true}
-            iconAs="MaterialIcons"
-            name="send"
-            width={-5}
-            size={32}
-            iconColor={colors.purplepro.purple7000}
-            IconStyle={{
-              left: 20,
-            }}
-            size={22}
-            onPress={() => {
-              props?.onSend(props);
-            }}
-          />
-        </View>
-      </Send>
-    );
-  };
+  // const renderSend = props => {
+  //   const {text} = props;
+  //   return (
+  //     <Send disabled={!props.text} {...props} alwaysShowSend={true}>
+  //       {/* <View
+  //         style={{
+  //           height: 45,
+  //           width: 70,
+  //         }}> */}
+  //       {/* <AppIconButton
+  //         leftIcon={true}
+  //         iconAs="MaterialIcons"
+  //         name="attachment"
+  //         width={-45}
+  //         height={-23}
+  //         size={22}
+  //         txtColor={colors.default.white}
+  //         iconColor={colors.amber.amber300}
+  //         style={[
+  //           {
+  //             top: 22,
+  //             right: 20,
+  //           },
+  //         ]}
+  //         // onPress={() => {
+  //         //    setModalVisible(true)
+  //         // }}
+  //       /> */}
+  //       <AppIconButton
+  //         leftIcon={true}
+  //         iconAs="MaterialIcons"
+  //         name="send"
+  //         width={-5}
+  //         size={32}
+  //         iconColor={colors.purplepro.purple7000}
+  //         IconStyle={{
+  //           left: 20,
+  //         }}
+  //         size={22}
+  //         onPress={() => {
+  //           props?.onSend(props);
+  //         }}
+  //       />
+  //       {/* </View> */}
+  //     </Send>
+  //   );
+  // };
   const deleteMessages = () => {
     const url =
       config.server +
@@ -562,6 +590,16 @@ const ChatScreen = props => {
     //   }
     // });
   };
+  const letSetIsTyping = () => {
+    setIsTyping(true);
+  };
+  // const renderAccessory = props => console.log('props', props);
+  // <AppAccessoryBar
+  //   onSend={messages => onSend(messages)}
+  //   setIsTyping={letSetIsTyping}
+  // />
+  // console.log('messages', messages);
+
   return (
     <>
       <Screen>
@@ -629,6 +667,7 @@ const ChatScreen = props => {
         <View
           onTouchStart={() => {
             Keyboard.dismiss();
+            setIsTyping(false);
           }}
           style={{flex: 1, backgroundColor: '#f1f1f1', marginBottom: 55}}>
           {showDelete ? (
@@ -673,44 +712,71 @@ const ChatScreen = props => {
           )}
 
           <View style={{height: height / 1.38}}>
-            {messages?.length === 0 ? (
+            {/* {messages?.length === 0 ? (
               <>
                 <ActivityIndicator size="large" color="red" />
               </>
-            ) : (
-              <>
-                {messages ? (
-                  <>
-                    {/* <ScrollView
-                      automaticallyAdjustKeyboardInsets={true}
-                      keyboardDismissMode="on-drag"
-                      keyboardShouldPersistTaps="never"> */}
-                    {/* <KeyboardAwareScrollView
-              viewIsInsideTabBar={true}
-              // extraHeight={360}
-              scrollEnabled={true}
-              bounces
-              style={{top: 10, height: 200, borderWidth: 3}}
-              // onTouchStart
-              enableOnAndroid={true}> */}
-                    {/* <KeyboardAvoidingView
-                      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                      style={{flex: 100, height: 100}}> */}
-                    <GiftedChat
+            ) : ( */}
+            <>
+              {messages ? (
+                <>
+                  <GiftedChat
+                    messages={
+                      chatRange > messages?.length
+                        ? messages
+                        : messages?.slice(0, chatRange)
+                    }
+                    text={text}
+                    onInputTextChanged={setText}
+                    onSend={messages => onSend(messages)}
+                    user={{
+                      _id: firestoreUser.uid,
+                    }}
+                    alignTop
+                    alwaysShowSend
+                    scrollToBottom
+                    // isTyping={isTyping}
+                    // showUserAvatar
+                    renderAvatarOnTop
+                    renderUsernameOnMessage
+                    bottomOffset={26}
+                    // onPressAvatar={console.log}
+                    renderInputToolbar={renderInputToolbar}
+                    renderActions={renderActions}
+                    renderComposer={renderComposer}
+                    setIsTyping={setIsTyping}
+                    // renderComposer={props => {
+                    //   <MessageInput
+                    //     {...props}
+                    //     //onSend={onSend}
+                    //     setIsTyping={setIsTyping}
+                    //   />;
+                    // }}
+                    renderSend={renderSend}
+                    renderAvatar={null}
+                    // renderAccessory={renderAccessory}
+                    renderBubble={renderBubble}
+                    // renderSystemMessage={renderSystemMessage}
+                    // renderMessage={renderMessage}
+                    // renderMessageText={renderMessageText}
+                    // renderMessageImage
+                    // renderCustomView={renderCustomView}
+                    isCustomViewBottom
+                    messagesContainerStyle={{backgroundColor: 'indigo'}}
+                    parsePatterns={linkStyle => [
+                      {
+                        pattern: /#(\w+)/,
+                        style: linkStyle,
+                        onPress: tag =>
+                          console.log(`Pressed on hashtag: ${tag}`),
+                      },
+                    ]}
+                  />
+                  {/* <GiftedChat
                       isKeyboardInternallyHandled={false}
-                      messagesContainerStyle={
-                        {
-                          //marginBottom: 200,
-                          // borderWidth: 2,
-                        }
-                      }
-                      // minComposerHeight={100}
                       forceGetKeyboardHeight={false}
                       scrollToBottomStyle={{
                         backgroundColor: colors.dangerpro.danger600,
-                        // top: 10,
-                        // height: 10,
-                        // borderWidth: 3,
                       }}
                       // messagesContainerStyle={{
                       //   backgroundColor: colors.dangerpro.danger600,
@@ -718,7 +784,6 @@ const ChatScreen = props => {
                       //   height: 200,
                       //   borderWidth: 3,
                       // }}
-                      // minInputToolbarHeight={100}
                       //messages={messages}
                       messages={
                         chatRange > messages?.length
@@ -726,79 +791,106 @@ const ChatScreen = props => {
                           : messages?.slice(0, chatRange)
                       }
                       showAvatarForEveryMessage={true}
-                      // chatRange > messages?.length
-                      //   ? messages
-                      //   : messages?.slice(0, chatRange)
-                      // }
-                      // renderInputToolbar={() => {
+                      renderComposer={renderComposer}
+                      renderInputToolbar={renderInputToolbar}
+                      // renderComposer={() => {
                       //   return (
-                      //     <MessageInput //onSend={onSend}
+                      //     <MessageInput
+                      //       onSend={onSend}
+                      //       setIsTyping={setIsTyping}
                       //     />
                       //   );
                       // }}
+                      // renderInputToolbar={() => {
+                      //   return <MessageInput onSend={onSend} />;
+                      // }}
                       // onSend={messages => onSend(messages, 'text')}
+                      alignTop
+                      showUserAvatar
+                      renderAvatarOnTop
+                      renderUsernameOnMessage
+                      bottomOffset={26}
                       onSend={messages => onSend(messages)}
                       multiline
                       alwaysShowSend
                       scrollToBottom
+                      renderActions={renderActions}
                       minComposerHeight={40}
                       minInputToolbarHeight={60}
                       scrollToBottomComponent={scrollToBottomComponent}
-                      renderSend={props => {
-                        const {text} = props;
-                        return (
-                          <Send {...props} alwaysShowSend={true}>
-                            <View
-                              style={{
-                                height: 45,
-                                width: 70,
-                              }}>
-                              <AppIconButton
-                                leftIcon={true}
-                                iconAs="MaterialIcons"
-                                name="attachment"
-                                width={-45}
-                                height={-23}
-                                size={22}
-                                txtColor={colors.default.white}
-                                iconColor={colors.amber.amber300}
-                                style={[
-                                  {
-                                    top: 22,
-                                    right: 20,
-                                  },
-                                ]}
-                                // onPress={() => {
-                                //    setModalVisible(true)
-                                // }}
-                              />
-                              <AppIconButton
-                                leftIcon={true}
-                                iconAs="MaterialIcons"
-                                name="send"
-                                width={-5}
-                                size={32}
-                                iconColor={colors.purplepro.purple7000}
-                                IconStyle={{
-                                  left: 20,
-                                }}
-                                size={22}
-                                onPress={() => {
-                                  props?.onSend(props);
-                                }}
-                              />
-                            </View>
-                          </Send>
-                        );
-                      }}
+                      renderSend={renderSend}
+                      renderSystemMessage={renderSystemMessage}
+                      // renderMessage={renderMessage}
+                      // renderMessageText={renderMessageText}
+                      // renderCustomView={renderCustomView}
+                      // renderSend={props => {
+                      //   const {text} = props;
+                      //   return (
+                      //     <Send {...props} alwaysShowSend={true}>
+                      //       <View
+                      //         style={{
+                      //           height: 45,
+                      //           width: 70,
+                      //         }}>
+                      //         <AppIconButton
+                      //           leftIcon={true}
+                      //           iconAs="MaterialIcons"
+                      //           name="attachment"
+                      //           width={-45}
+                      //           height={-23}
+                      //           size={22}
+                      //           txtColor={colors.default.white}
+                      //           iconColor={colors.amber.amber300}
+                      //           style={[
+                      //             {
+                      //               top: 22,
+                      //               right: 20,
+                      //             },
+                      //           ]}
+                      //           // onPress={() => {
+                      //           //    setModalVisible(true)
+                      //           // }}
+                      //         />
+                      //         <AppIconButton
+                      //           leftIcon={true}
+                      //           iconAs="MaterialIcons"
+                      //           name="send"
+                      //           width={-5}
+                      //           size={32}
+                      //           iconColor={colors.purplepro.purple7000}
+                      //           IconStyle={{
+                      //             left: 20,
+                      //           }}
+                      //           size={22}
+                      //           onPress={() => {
+                      //             props?.onSend(props);
+                      //             setIsTyping(false);
+                      //           }}
+                      //         />
+                      //       </View>
+                      //     </Send>
+                      //   );
+                      // }}
+                      renderComposer={renderComposer}
                       // onLongPress={(context, message) => {
                       //   let temp = [...msgIds];
                       //   temp.push(message._id);
                       //   setMsgIds(temp);
                       //   setShowDelete(true);
                       // }}
+                      isTyping={isTyping}
                       renderAvatar={null}
                       renderBubble={renderBubble}
+                      isCustomViewBottom
+                      messagesContainerStyle={{backgroundColor: 'indigo'}}
+                      parsePatterns={linkStyle => [
+                        {
+                          pattern: /#(\w+)/,
+                          style: linkStyle,
+                          onPress: tag =>
+                            console.log(`Pressed on hashtag: ${tag}`),
+                        },
+                      ]}
                       listViewProps={{
                         scrollEventThrottle: 400,
                         onScroll: ({nativeEvent}) => {
@@ -808,37 +900,25 @@ const ChatScreen = props => {
                         },
                       }}
                       user={{
-                        // _id: '1',
                         _id: firestoreUser.uid,
                       }}
-                    />
-                    {/* {Platform.OS === 'android' && (
+                    /> */}
+                  {isTyping ? <KeyboardViewSpacer /> : null}
+
+                  {/* {Platform.OS === 'android' && (
                       <KeyboardAvoidingView
                         behavior="padding"
                         style={{flex: 0.5, height: 0}}
                       />
                     )} */}
-                    <KeyboardAvoidingView
-                      behavior={
-                        Platform.OS === 'ios'
-                          ? 'padding'
-                          : Platform.OS === 'android'
-                          ? 'padding'
-                          : 'height'
-                      }
-                      style={{flex: 0.5}}
-                    />
-                    {/* </KeyboardAwareScrollView> */}
-                    {/* </KeyboardAvoidingView> */}
-                    {/* </ScrollView> */}
-                  </>
-                ) : (
-                  <>
-                    <Text style={{marginTop: 20}}></Text>
-                  </>
-                )}
-              </>
-            )}
+                </>
+              ) : (
+                <>
+                  <Text style={{marginTop: 20}}></Text>
+                </>
+              )}
+            </>
+            {/* )} */}
           </View>
         </View>
       </Screen>
@@ -875,7 +955,6 @@ const styles = StyleSheet.create({
   headingBox: {
     marginLeft: 2,
     flex: 1,
-    // borderWidth: 1,
   },
   subject: {
     fontSize: 12,
@@ -894,4 +973,171 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  textInputStyle: {
+    color: '#222B45',
+    backgroundColor: '#EDF1F7',
+    borderWidth: 1,
+    borderRadius: 5,
+    borderColor: '#E4E9F2',
+    paddingTop: 8.5,
+    paddingHorizontal: 12,
+    marginLeft: 0,
+    width: width / 1.3,
+  },
 });
+
+// <View style={{height: isTyping ? height / 1.05 : height / 1.25}}>
+// {messages?.length === 0 ? (
+//   <>
+//     <ActivityIndicator size="large" color="red" />
+//   </>
+// ) : (
+//   <>
+//     {messages ? (
+//       <>
+//         {/* <ScrollView> */}
+//         <GiftedChat
+//           isKeyboardInternallyHandled={false}
+//           forceGetKeyboardHeight={false}
+//           scrollToBottomStyle={{
+//             backgroundColor: colors.dangerpro.danger600,
+//           }}
+//           messagesContainerStyle={{
+//             backgroundColor: colors.dangerpro.danger600,
+//             // top: 10,
+//             // height: 200,
+//             // borderWidth: 3,
+//           }}
+//           scrollToBottom
+//           messages={messages}
+//           // messages={
+//           //   chatRange > messages?.length
+//           //     ? messages
+//           //     : messages?.slice(0, chatRange)
+//           // }
+//           showAvatarForEveryMessage={true}
+//           scrollToBottomOffset={400}
+//           infiniteScroll={true}
+//           // renderInputToolbar={() => {
+//           // renderComposer={props => {
+//           //   return (
+//           //     <MessageInput
+//           //       onSend={onSend}
+//           //       renderSend={renderSend}
+//           //       setIsTyping={setIsTyping}
+//           //       {...props}
+//           //     />
+//           //   );
+//           // }}
+//           // onSend={messages => onSend(messages, 'text')}
+//           onSend={messages => onSend(messages)}
+//           multiline
+//           alwaysShowSend
+//           scrollToBottom
+//           minComposerHeight={40}
+//           minInputToolbarHeight={60}
+//           scrollToBottomComponent={scrollToBottomComponent}
+//           renderSend={renderSend}
+//           // renderSend={props => {
+//           //   const {text} = props;
+//           //   return (
+//           //     <Send {...props} alwaysShowSend={true}>
+//           //       <View
+//           //         style={{
+//           //           height: 45,
+//           //           width: 70,
+//           //         }}>
+//           //         <AppIconButton
+//           //           leftIcon={true}
+//           //           iconAs="MaterialIcons"
+//           //           name="attachment"
+//           //           width={-45}
+//           //           height={-23}
+//           //           size={22}
+//           //           txtColor={colors.default.white}
+//           //           iconColor={colors.amber.amber300}
+//           //           style={[
+//           //             {
+//           //               top: 22,
+//           //               right: 20,
+//           //             },
+//           //           ]}
+//           //         />
+//           //         <AppIconButton
+//           //           leftIcon={true}
+//           //           iconAs="MaterialIcons"
+//           //           name="send"
+//           //           width={-5}
+//           //           size={32}
+//           //           iconColor={colors.purplepro.purple7000}
+//           //           IconStyle={{
+//           //             left: 20,
+//           //           }}
+//           //           size={22}
+//           //           onPress={() => {
+//           //             props?.onSend(props);
+//           //             setIsTyping(false);
+//           //           }}
+//           //         />
+//           //       </View>
+//           //     </Send>
+//           //   );
+//           // }}
+//           // renderAccessory={
+//           //   Platform.OS === 'web' ? null : renderAccessory
+//           // }
+//           keyboardShouldPersistTaps="never"
+//           isKeyboardInternallyHandled={false}
+//           isTyping={isTyping}
+
+//           infiniteScroll
+//           // onLongPress={(context, message) => {
+//           //   let temp = [...msgIds];
+//           //   temp.push(message._id);
+//           //   setMsgIds(temp);
+//           //   setShowDelete(true);
+//           // }}
+//           renderAvatar={null}
+//           renderBubble={renderBubble}
+//           listViewProps={{
+//             scrollEventThrottle: 400,
+//             onScroll: ({nativeEvent}) => {
+//               if (isCloseToTop(nativeEvent)) {
+//                 console.log('chatRange', chatRange);
+//                 setChatRange(chatRange + 20);
+//               }
+//             },
+//           }}
+//           user={{
+//             // _id: '1',
+//             _id: firestoreUser.uid,
+//           }}
+//         />
+//         {/* </ScrollView> */}
+//         {isTyping ? <KeyboardViewSpacer /> : null}
+
+//         {/* {Platform.OS === 'android' && (
+//           <KeyboardAvoidingView
+//             behavior="padding"
+//             style={{flex: 0.5, height: 0}}
+//           />
+//         )} */}
+//         {/* <KeyboardAvoidingView
+//           behavior={
+//             Platform.OS === 'ios'
+//               ? 'padding'
+//               : Platform.OS === 'android'
+//               ? 'padding'
+//               : 'height'
+//           }
+//           style={{flex: 0.5}}
+//         /> */}
+//       </>
+//     ) : (
+//       <>
+//         <Text style={{marginTop: 20}}></Text>
+//       </>
+//     )}
+//   </>
+// )}
+// </View>

@@ -41,9 +41,11 @@ const InboxScreen = props => {
   const [loading, setLoading] = useState(true);
 
   async function getFireUsers(cr) {
+    // console.log('cr', cr);
     setUsers([]);
+    // setUsers(users => [...users, []]);
     setUserName('');
-    cr.forEach(async (docId, i) => {
+    cr?.forEach(async (docId, i) => {
       let eshopDb = await firestore()
         .collection('eshop')
         .doc('eShop-hV1O5KpI9ZhoOqjA0CuZqcJfdyl2');
@@ -78,19 +80,17 @@ const InboxScreen = props => {
       if (ShopId) {
         allUsers?.map(async (usr, i) => {
           const resChatUser = await getUserProfileByUUID(usr?.senderId);
-          console.log('resChatUser[i]?.name', resChatUser[i]?.name);
-          // setUserName(resChatUser[i]?.name);
+          // console.log('resChatUser[i]?.name', resChatUser[i]?.name);
           const un = [resChatUser[i]?.name];
-          setUserName(userName => [...userName, ...un]); //resChatUser[i]?.
+          setUserName(userName => [...userName, ...un]);
           setUserUUid(resChatUser[i]?.user_uid);
           setLoading(false);
         });
       } else if (userUid) {
         allUsers?.map(async (usr, i) => {
           const resChatUser = await getShopDetailByUuid(usr?.receiverId);
-          console.log('resChatUser[i]?.name', resChatUser[i]?.name);
-          setUserName(resChatUser[i]?.name);
-          //setUserName(userName => [userName, resChatUser[i]?.name]); //resChatUser[i]?.name);
+          const un = [resChatUser[i]?.name];
+          setUserName(userName => [...userName, ...un]);
           setShopUUid(resChatUser[i]?.shopUuid);
           setLoading(false);
         });
@@ -100,21 +100,21 @@ const InboxScreen = props => {
   useEffect(() => {
     const interval = setInterval(() => {
       if (userUid) {
-        console.log('userUid', userUid);
         getfireusersChat(userUid).then(res => {
-          var result = res.reduce((r, o) => {
+          var result = res?.reduce((r, o) => {
             Object.entries(o).forEach(([k, v]) => {
               r[k] = r[k] || [];
               if (!r[k].includes(v)) r[k].push(v);
             });
             return r;
           }, Object.create(null));
+          // console.log('result', result);
           setChatList(result?.chatroom_uuid);
           getFireUsers(result?.chatroom_uuid);
         });
       } else if (ShopId) {
         getfireShopChat(ShopId).then(res => {
-          var result = res.reduce((r, o) => {
+          var result = res?.reduce((r, o) => {
             Object.entries(o).forEach(([k, v]) => {
               r[k] = r[k] || [];
               if (!r[k].includes(v)) r[k].push(v);
@@ -126,7 +126,7 @@ const InboxScreen = props => {
         });
       }
       // getFireUsers();
-    }, 10000);
+    }, 8000);
     return () => {
       clearInterval(interval);
     };
@@ -163,7 +163,7 @@ const InboxScreen = props => {
         />
         <Text style={{color: colors.default.white, fontSize: 25}}>Inbox</Text>
       </View>
-      {console.log('userName', userName)}
+
       {users?.length === 0 ? (
         <>
           <ActivityIndicator size="large" color="red" />
@@ -180,18 +180,12 @@ const InboxScreen = props => {
                     <>
                       <TouchableOpacity
                         onPress={() => {
-                          console.log(
-                            ' item userUUid shopUUid',
-                            item,
-                            // userUUid,
-                            // shopUUid,
-                          );
                           props.navigation.navigate('ChatScreen', {
                             item,
                             userUUid: userUUid,
                             shopUUid: shopUUid,
                             chatList: chatList,
-                            userName: userName,
+                            userName: userName[index],
                           });
                         }}
                         style={styles.messageCard}>

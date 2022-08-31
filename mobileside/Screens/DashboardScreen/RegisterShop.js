@@ -17,8 +17,10 @@ import {getShopDetail} from '../../Redux/actions/ShopAuth.action';
 import {saveCurrentShop} from '../../Redux/actions/ShopAuth.action';
 import {ActivityIndicator} from 'react-native';
 const {width, height} = Dimensions.get('window');
+
 const RegisterShop = props => {
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState([]);
   const [name, setName] = useState('');
   const [owner, setOwner] = useState('');
   const [email, setEmail] = useState('');
@@ -39,12 +41,9 @@ const RegisterShop = props => {
   const shopId = shopValue?.shop?.shopId;
 
   const isShopAuthenticated = props?.isShopAuthenticated;
-  const validationSchema = Yup.object().shape({
-    name: Yup.string().required().label('Name'),
-    email: Yup.string().required().label('Email'),
-  });
+
   useEffect(() => {
-    if (!shopValue) {
+    if (!shopValue.shop) {
       setShop(null);
       setLoading(false);
     } else {
@@ -60,7 +59,6 @@ const RegisterShop = props => {
         setLoading(false);
       });
     }
-    console.log('validationSchema', validationSchema);
     AsyncStorage.getItem('shop_jwt')
       .then(res => {
         setToken(res);
@@ -133,13 +131,25 @@ const RegisterShop = props => {
           number: number,
         };
 
-        saveCurrentShop(isShopAuthenticated, newshop).then(_res => {
-          shopAction(_res);
-          setLoading(false);
-        });
-        context?.registerWithFireStore(name, email, password, false, true);
+        // saveCurrentShop(isShopAuthenticated, newshop).then(_res => {
+        //   shopAction(_res);
+        //   setLoading(false);
+        // });
+        // context?.registerWithFireStore(name, email, password, false, true);
       }
     }
+  };
+  const validateEmail = em => {
+    // if (
+    //   !em.match(
+    //     /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+    //   )
+    // ) {
+    //   return setError('please input a valid email');
+    // }
+    return em.match(
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+    );
   };
 
   return (
@@ -156,9 +166,10 @@ const RegisterShop = props => {
             <>
               <KeyboardAwareScrollView
                 viewIsInsideTabBar={true}
-                extraHeight={360}
+                // extraHeight={360}
                 enableOnAndroid={true}>
-                <FormContainer>
+                <FormContainer //title="Shop Profile"
+                >
                   <InputField
                     placeholder="Name"
                     name="name"
@@ -187,7 +198,7 @@ const RegisterShop = props => {
                     id={'number'}
                     // value={number}
                     value={number?.toString()}
-                    keyboardType={'numeric'}
+                    keyBoardType={'numeric'}
                     onChangeText={text => setNumber(text)}
                   />
                   <InputField
@@ -214,7 +225,10 @@ const RegisterShop = props => {
                   />
 
                   <View>{error ? <Error message={error} /> : null}</View>
-                  <View>
+                  <View
+                    style={{
+                      marginVertical: 20,
+                    }}>
                     <AppIconButton
                       title="Save"
                       size={25}
@@ -244,37 +258,104 @@ const RegisterShop = props => {
                     value={name}
                     id={'name'}
                     onChangeText={text => setName(text)}
+                    onEndEditing={() => {
+                      if (!name) {
+                        setErrors({name: 'please input name'});
+                        // handleErrors({name: 'please input name'}, 'name');
+                      }
+                    }}
+                    onFocus={() => {
+                      if (!name) {
+                        setErrors({name: 'please input name'});
+                        // handleErrors({name: 'please input name'}, 'name');
+                      }
+                    }}
                   />
-                  {/* <InputField
-                    placeholder="Owner Name"
-                    name="owner"
-                    value={owner}
-                    id={'owner'}
-                    onChangeText={text => setOwner(text)}
-                  /> */}
+                  {/* {errors?.name && (
+                    <View>
+
+                      {errors?.name ? <Error message={errors?.name} /> : null}
+                    </View>
+                  )} */}
                   <InputField
                     placeholder="Email "
                     name="email"
                     value={email}
                     id={'email'}
                     onChangeText={text => setEmail(text.toLowerCase())}
+                    onEndEditing={() => {
+                      // if (!email) {
+                      //   // setErrors({email: 'please input email'});
+                      //   setErrors(prevError => [
+                      //     ...prevError,
+                      //     {email1: 'please input email'},
+                      //   ]);
+                      //   // handleErrors({email: 'please input email'}, 'email');
+                      // } else
+                      if (!validateEmail(email)) {
+                        // setErrors();
+                        console.log(
+                          '!validateEmail(email)',
+                          !validateEmail(email),
+                        );
+                        setErrors(prevError => [
+                          ...prevError,
+                          {email2: 'please input a valid email'},
+                        ]);
+                        console.log('errors', errors);
+                        // handleErrors(
+                        //   {email: 'please input a valid email'},
+                        //   'email',
+                        // );
+                      } else {
+                        setErrors([]);
+                      }
+                    }}
+                    //
+                    onFocus={() => {
+                      setErrors([]);
+                      if (!email) {
+                        // setErrors({email: 'please input email'});
+                        setErrors(prevError => [
+                          ...prevError,
+                          {email1: 'please input email'},
+                        ]);
+                        // handleErrors({email: 'please input email'}, 'email');
+                      }
+                    }}
                   />
+
+                  <Text>
+                    {/* <Text>{errors ? errors[0]?.email1 : ''}</Text> */}
+
+                    {/* {console.log(
+
+                      '__errors',
+                      errors?.filter(err => {
+                        return err;
+                      }),
+                    )} */}
+                    {/* {
+                      errors?.filter(err => {
+                        return err;
+                      }).email1
+                    } */}
+                    {/* {errors &&
+                      errors?.forEach(err => {
+                        if (err?.email1) return <Error message={err?.email1} />;
+                        else if (err?.email2)
+                          return <Error message={err?.email2} />;
+                        else return null;
+                      })} */}
+                  </Text>
                   <InputField
                     placeholder="Password"
                     name="password"
                     value={password}
                     id={'password'}
-                    secureTextEntry={true}
+                    password
                     onChangeText={text => setPassword(text)}
                   />
-                  {/* <InputField
-                    placeholder=" Number"
-                    name="number"
-                    id={'number'}
-                    value={number?.toString()}
-                    keyboardType={'numeric'}
-                    onChangeText={text => setNumber(text)}
-                  /> */}
 
                   <View>{error ? <Error message={error} /> : null}</View>
                   <View>
@@ -347,14 +428,12 @@ const styles = StyleSheet.create({
 //         Authorization: `Bearer ${token}`,
 //       },
 //     };
-
 //     if (isShopAuthenticated) {
 //       console.log('update shop data');
 //       const putResponse = await axios.put(updateShopURL, putshop, config);
 //       let result = putResponse.then(res => {
 //         return res;
 //       });
-
 //       shopAction(result);
 //       // shopAction(updateShopURL, shop, config);
 //     } else {
@@ -375,3 +454,177 @@ const styles = StyleSheet.create({
 //     }
 //   }
 // };
+
+// const [inputs, setInputs] = useState({
+//   name: name,
+//   email: email,
+//   owner: owner,
+//   password: password,
+//   type: type,
+//   number: number,
+//   discription: discription,
+//   address: address,
+// });
+// const validateEmail = em => {
+//   if (
+//     !em.match(
+//       /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+//     )
+//   ) {
+//     return setError('please input a valid email');
+//   }
+//   return;
+// };
+// function validate() {
+//   Keyboard.dismiss();
+//   let valid = true;
+//   const validateEmail = em => {
+//     return em?.match(
+//       /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+//     );
+//   };
+//   if (!email) {
+//     setError('please input email');
+//   } else if (!validateEmail(email)) {
+//     setError('please input a valid email');
+//   } else if (!name) {
+//     setError('please input name');
+//   } else if (!password) {
+//     setError('please input password');
+//   } else if (!password.length > 4 || !password.length < 16) {
+//     setError('please  password must be in between 4 to 16 chracters');
+//   }
+// }
+// function handleErrors(err, input) {
+//   setErrors(prevError => ({...prevError, [input]: err}));
+// }
+// function handleOnChangeText(setState, text, input) {
+//   console.log('text', text, 'name', name);
+//   setState(preValue => [...preValue, ...text]);
+// }
+//   <KeyboardAwareScrollView
+//   viewIsInsideTabBar={true}
+//   extraHeight={200}
+//   enableOnAndroid={true}>
+//   <AppLoader visible={loading} loaderColor="#000" />
+//   <FormContainer title="Create Shop Account">
+//     <InputField
+//       placeholder="Shop Name"
+//       name="name"
+//       value={name}
+//       id={'name'}
+//       // error={errors?.name}
+//       onEndEditing={() => {
+//         if (!name) {
+//           // setError('please input name');
+//           //setErrors({name: 'please input name'});
+//           handleErrors({name: 'please input name'}, 'name');
+//         }
+//       }}
+//       onFocus={() => {
+//         if (!name) {
+//           // setError('please input name');
+//           //setErrors({name: 'please input name'});
+//           handleErrors({name: 'please input name'}, 'name');
+//         }
+//       }}
+//       onChangeText={text => {
+//         //handleOnChangeText(setName, text, name);
+//         setName(text);
+//       }}
+//     />
+//     {errors?.name && (
+//       <View>
+//         {errors?.name ? <Error message={errors?.name} /> : null}
+//       </View>
+//     )}
+//     <InputField
+//       placeholder="Email "
+//       name="email"
+//       value={email}
+//       // error={errors?.email}
+//       id={'email'}
+//       onEndEditing={() => {
+//         console.log('editing end');
+//         if (!email) {
+//           // setErrors({email: 'please input email'});
+//           handleErrors({email: 'please input email'}, 'email');
+//         } else if (!validateEmail(email)) {
+//           // setErrors({email: 'please input a valid email'});
+//           handleErrors(
+//             {email: 'please input a valid email'},
+//             'email',
+//           );
+//         }
+//       }}
+
+//       onChangeText={text => {
+//         //handleOnChangeText(setEmail, text, 'email');
+
+//         setEmail(text.toLowerCase());
+//       }}
+//     />
+//     {errors?.email && (
+//       <View>
+//         {errors?.email ? <Error message={errors?.email} /> : null}
+//       </View>
+//     )}
+//     <InputField
+//       placeholder="Password"
+//       name="password"
+//       value={password}
+//       id={'password'}
+//       // error={errors?.password}
+//       password
+//       onEndEditing={() => {
+//         console.log('editing end');
+//         if (!password) {
+//           setErrors({password: 'please input password'});
+//         } else if (!validateEmail(password)) {
+//           setErrors({password: 'please input a valid password'});
+//         }
+//       }}
+//       onChangeText={text => {
+//         setPassword(text);
+//         //handleOnChangeText(setPassword, text, 'password');
+//       }}
+//     />
+//     {errors?.password && (
+//       <View>
+//         {errors?.password ? (
+//           <Error message={errors?.password} />
+//         ) : null}
+//       </View>
+//     )}
+
+//     {/* <View>{error ? <Error message={error} /> : null}</View> */}
+//     <View>
+//       <AppIconButton
+//         title="Register as Shop"
+//         size={25}
+//         width={25}
+//         height={4}
+//         marginX="3%"
+//         marginY="1%"
+//         borderRadius={0}
+//         buttonBgColor={colors.successpro.success500}
+//         txtColor={colors.default.white}
+//         onPress={() => saveShop()}
+//       />
+//     </View>
+//     <View>
+//       <AppIconButton
+//         title="Login as Shop"
+//         size={25}
+//         width={25}
+//         height={4}
+//         marginX="3%"
+//         marginY="1%"
+//         borderRadius={0}
+//         buttonBgColor={colors.warningpro.warning500}
+//         txtColor={colors.default.white}
+//         onPress={() => props.navigation.navigate('Login')}
+//       />
+//     </View>
+//   </FormContainer>
+// </KeyboardAwareScrollView>

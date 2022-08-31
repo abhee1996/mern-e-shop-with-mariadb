@@ -29,5 +29,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 30,
+    // margin: 15,
+    fontSize: 25,
+    fontWeight: 'bold',
   },
 });

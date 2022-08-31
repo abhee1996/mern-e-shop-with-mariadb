@@ -12,17 +12,21 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
+import KeyboardViewSpacer from 'react-native-keyboard-view-space/lib';
 import colors from '../../config/colors';
+import {RenderSend} from '../../Screens/ChatScreens/chat.screen';
 import AppIconButton from '../AppButtons/AppIconButton';
+// import KeyboardSpacer from 'react-native-keyboard-spacer';
+const {width, height} = Dimensions.get('window');
 
 // import ImagePicker from "react-native-image-crop-picker";
 // import { Overlay } from "react-native-elements";
 
-function MessageInput({onSend, props}) {
+function MessageInput({onSend, setIsTyping, props}) {
   const [modalVisible, setModalVisible] = useState(false);
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [value, setValue] = useState('');
-
+  // console.log('props', props);
   const pickImage = async () => {
     ImagePicker.openPicker({
       width: 300,
@@ -51,9 +55,11 @@ function MessageInput({onSend, props}) {
   };
 
   const sendMessage = () => {
-    onSend(value, 'text');
-    setValue('');
+    onSend(value);
+    // onSend(value, 'text');
+    // setValue('');
     Keyboard.dismiss();
+    setIsTyping(false);
   };
 
   return (
@@ -66,21 +72,26 @@ function MessageInput({onSend, props}) {
           value={value}
           placeholder="Your message here..."
           onChangeText={text => setValue(text)}
+          onFocus={() => {
+            props.setIsTyping(true);
+          }}
         />
-
-        <AppIconButton
+        {/* {renderSend} */}
+        {/* <RenderSend {...props} /> */}
+        {/* <AppIconButton
           leftIcon={true}
           iconAs="MaterialIcons"
           name="attachment"
-          width={-45}
+          width={-65}
           height={23}
           size={22}
           txtColor={colors.default.white}
           style={[
             {
               // backgroundColor: colors.dangerpro.danger600,
-              marginLeft: 12,
+              // marginLeft: 12,
               alignSelf: 'center',
+              borderWidth: 2,
             },
           ]}
           // onPress={() => {
@@ -91,22 +102,24 @@ function MessageInput({onSend, props}) {
           leftIcon={true}
           iconAs="MaterialIcons"
           name="send"
-          width={-45}
+          width={-65}
           height={23}
           size={22}
           txtColor={colors.default.white}
           style={[
             {
               backgroundColor: colors.dangerpro.danger600,
-              marginLeft: 12,
+              // marginLeft: 12,
               alignSelf: 'center',
+              borderWidth: 2,
             },
           ]}
           onPress={() => {
             sendMessage();
           }}
-        />
+        /> */}
       </View>
+
       <Overlay
         visible={modalVisible}
         transparent={true}
@@ -181,7 +194,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.default.white,
     borderRadius: 3,
     flexDirection: 'row',
-    marginHorizontal: 20,
+    marginHorizontal: 2,
+    // borderWidth: 2,
     //bottom: 90,
   },
   text: {
@@ -191,13 +205,15 @@ const styles = StyleSheet.create({
   },
   input: {
     paddingHorizontal: 15,
-    maxHeight: Dimensions.get('window').height / 10,
-    width: '78%',
+    maxHeight: height / 16,
+    width: '70%',
+    borderWidth: 2,
   },
   icons: {
     flexDirection: 'row',
-    alignSelf: 'flex-end',
+    // alignSelf: 'flex-end',
     margin: 10,
+    borderWidth: 2,
   },
   modal: {
     marginTop: '70%',

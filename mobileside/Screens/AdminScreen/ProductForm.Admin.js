@@ -406,13 +406,17 @@ const AdminProductForm = props => {
               {item ? 'Update Product ' : 'Add Product'}
             </Text>
           </View>
-          <KeyboardAwareScrollView
-            viewIsInsideTabBar={true}
-            enableOnAndroid={true}>
-            <FormContainer
-            //title={item ? 'Update Product ' : 'Add Product'}
-            >
-              {/* <View style={styles.ImageContainer}>
+          <View
+            style={{
+              backgroundColor: colors.indigopro.indigo300,
+            }}>
+            <KeyboardAwareScrollView
+              viewIsInsideTabBar={true}
+              enableOnAndroid={true}>
+              <FormContainer
+              //title={item ? 'Update Product ' : 'Add Product'}
+              >
+                {/* <View style={styles.ImageContainer}>
             <Image style={styles.Image} source={{uri: mainImage}} />
             <TouchableOpacity
               onPress={() => {
@@ -425,104 +429,105 @@ const AdminProductForm = props => {
               <FontAwesome name="camera" style={{color: 'white'}} />
             </TouchableOpacity>
           </View> */}
-              <InputField
-                placeholder="Brand"
-                name="brand"
-                id={'brand'}
-                value={brand}
-                islabel={true}
-                label={'Brand'}
-                labelStyle={styles.label}
-                onChangeText={text => setBrand(text)}
-              />
-              <InputField
-                placeholder="Name"
-                name="name"
-                id={'name'}
-                value={name}
-                islabel={true}
-                label={'Name'}
-                labelStyle={styles.label}
-                onChangeText={text => setName(text)}
-              />
-              <InputField
-                placeholder="Price"
-                name="price"
-                id={'price'}
-                value={price}
-                islabel={true}
-                label={'Price'}
-                labelStyle={styles.label}
-                keyboardType={'numeric'}
-                onChangeText={text => setPrice(text)}
-              />
-              <InputField
-                placeholder="Stock"
-                name="stock"
-                id={'stock'}
-                value={countInStock}
-                islabel={true}
-                label={'Count in Stock'}
-                keyboardType={'numeric'}
-                labelStyle={styles.label}
-                onChangeText={text => setCountInStock(text)}
-              />
+                <InputField
+                  placeholder="Brand"
+                  name="brand"
+                  id={'brand'}
+                  value={brand}
+                  islabel={true}
+                  label={'Brand'}
+                  labelStyle={styles.label}
+                  onChangeText={text => setBrand(text)}
+                />
+                <InputField
+                  placeholder="Name"
+                  name="name"
+                  id={'name'}
+                  value={name}
+                  islabel={true}
+                  label={'Name'}
+                  labelStyle={styles.label}
+                  onChangeText={text => setName(text)}
+                />
+                <InputField
+                  placeholder="Price"
+                  name="price"
+                  id={'price'}
+                  value={price}
+                  islabel={true}
+                  label={'Price'}
+                  labelStyle={styles.label}
+                  keyBoardType={'number-pad'}
+                  onChangeText={text => setPrice(text)}
+                />
+                <InputField
+                  placeholder="Stock"
+                  name="stock"
+                  id={'stock'}
+                  value={countInStock}
+                  islabel={true}
+                  label={'Count in Stock'}
+                  keyBoardType={'numeric'}
+                  labelStyle={styles.label}
+                  onChangeText={text => setCountInStock(text)}
+                />
 
-              <InputField
-                placeholder="SKU"
-                name="sku"
-                id={'sku'}
-                value={sku}
-                islabel={true}
-                label={'Sku'}
-                labelStyle={styles.label}
-                onChangeText={text => setSku(text)}
-              />
-              <InputField
-                placeholder="Description"
-                name="description"
-                id={'description'}
-                value={description}
-                islabel={true}
-                label={'Description'}
-                labelStyle={styles.label}
-                onChangeText={text => setDescription(text)}
-              />
-              <View style={{marginTop: 10}}>
-                <AppPicker
-                  selectedValue={pickerValue}
-                  pickerStyle={styles.picker}
-                  prickerItemStyle={styles.pickerItem}
-                  onValueChange={item => {
-                    console.log('cate item', item);
-                    setPickerValue(item),
-                      setCategory(item),
-                      setCategoryId(item);
-                  }}
-                  dataArray={categories}
-                  placeholder={'Select Category'}
-                  pickerWidth={320}
+                <InputField
+                  placeholder="SKU"
+                  name="sku"
+                  id={'sku'}
+                  value={sku}
+                  islabel={true}
+                  label={'Sku'}
+                  labelStyle={styles.label}
+                  onChangeText={text => setSku(text)}
                 />
-              </View>
-              <View>{error ? <Error message={error} /> : null}</View>
-              <View>
-                <ImageViewer />
-              </View>
-              <View style={styles.buttonContainer}>
-                <AppIconButton
-                  title="Save"
-                  leftIcon={true}
-                  size={15}
-                  marginX="3.5%"
-                  marginY="7%"
-                  borderRadius={0}
-                  buttonBgColor={colors.successpro.success500}
-                  txtColor={colors.default.white}
-                  onPress={() => saveProduct()}
+                <InputField
+                  placeholder="Description"
+                  name="description"
+                  id={'description'}
+                  value={description}
+                  islabel={true}
+                  label={'Description'}
+                  labelStyle={styles.label}
+                  onChangeText={text => setDescription(text)}
                 />
-              </View>
-            </FormContainer>
-          </KeyboardAwareScrollView>
+                <View style={{marginTop: 10}}>
+                  <AppPicker
+                    selectedValue={pickerValue}
+                    pickerStyle={styles.picker}
+                    prickerItemStyle={styles.pickerItem}
+                    onValueChange={item => {
+                      console.log('cate item', item);
+                      setPickerValue(item),
+                        setCategory(item),
+                        setCategoryId(item);
+                    }}
+                    dataArray={categories}
+                    placeholder={'Select Category'}
+                    pickerWidth={320}
+                  />
+                </View>
+                <View>{error ? <Error message={error} /> : null}</View>
+                <View>
+                  <ImageViewer />
+                </View>
+                <View style={styles.buttonContainer}>
+                  <AppIconButton
+                    title="Save"
+                    leftIcon={true}
+                    size={15}
+                    marginX="3.5%"
+                    marginY="7%"
+                    borderRadius={0}
+                    buttonBgColor={colors.successpro.success500}
+                    txtColor={colors.default.white}
+                    onPress={() => saveProduct()}
+                  />
+                </View>
+              </FormContainer>
+            </KeyboardAwareScrollView>
+          </View>
           <AppDrawer refRBSheet={refRBSheet}>
             <RenderInner />
           </AppDrawer>

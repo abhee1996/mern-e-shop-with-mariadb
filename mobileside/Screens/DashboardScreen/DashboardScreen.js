@@ -42,7 +42,7 @@ const DashboardScreen = () => {
   return (
     <View
       style={{
-        flex: 1,
+        // flex: 1,
         backgroundColor: colors.voiletpro.violet500,
         alignItems: 'center',
       }}>
@@ -52,8 +52,16 @@ const DashboardScreen = () => {
       <Text style={{color: '#fff', fontSize: 20}}>
         Shop Name :{`\t ${currentShop?.name}`}
       </Text>
-      <Text style={{fontWeight: 'bold', fontSize: 25}}>Shop Profile</Text>
-
+      <Text
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignSelf: 'center',
+          fontWeight: 'bold',
+          fontSize: 25,
+        }}>
+        Shop Profile
+      </Text>
       {ShopId ? (
         <>
           <RegisterShop isShopAuthenticated={isShopAuthenticated} />

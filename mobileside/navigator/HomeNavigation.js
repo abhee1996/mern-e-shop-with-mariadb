@@ -67,7 +67,6 @@ const ProductStackNavigator = () => {
     </Stack.Navigator>
   );
 };
-const UserStack = createStackNavigator();
 
 const AuthStackNavigator = () => {
   return (
@@ -174,6 +173,7 @@ const CartStackNavigator = () => {
 //     </Stack.Navigator>
 //   );
 // };
+
 const AdminStackNavigator = () => {
   return (
     <Stack.Navigator>
@@ -225,7 +225,6 @@ const HomeNavigation = () => {
 };
 
 export {
-  // AllStackNavigator,
   AuthStackNavigator,
   HomeNavigation,
   UserStackNavigator,

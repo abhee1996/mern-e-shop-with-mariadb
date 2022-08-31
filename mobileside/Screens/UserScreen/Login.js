@@ -79,18 +79,14 @@ const Login = props => {
         }}>
         <InputField
           placeholder="Enter Email address"
-          borderRadius={5}
-          height={2}
           name="email"
           id="email"
+          isIcon={true}
+          iconName="email-outline"
           value={email}
           onChangeText={text => setEmail(text)}
+          keyBoardType={`email-address`}
         />
-        {/* {email === '' ? (
-            
-            <>
-            <Error message={error} />
-            </>) : null} */}
       </View>
       <View
         style={{
@@ -101,12 +97,13 @@ const Login = props => {
         }}>
         <InputField
           placeholder="Enter Password"
-          borderRadius={5}
-          height={2}
           name="password"
           id="password"
-          secureTextEntry={true}
+          isIcon={true}
+          iconName="lock-outline"
+          keyBoardType={'visible-password'}
           value={password}
+          password
           onChangeText={text => setPassword(text)}
         />
 
